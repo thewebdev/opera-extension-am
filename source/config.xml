@@ -15,8 +15,10 @@
 		<param name="url" value="http://adsense.google.com"/>
 	</feature>
 	<preference name="interval" value="20"/>
-	<preference name="showfor" value="3"/>	
+	<preference name="showfor" value="3"/>
+	<feature name="opera:share-cookies" required="true"/>
 	<access origin="http://google.com/" subdomains="true"/>
+	<access origin="https://google.com/" subdomains="true"/>
 	<license href="http://www.gnu.org/licenses/gpl-3.0.html">Licensed under GPL v3.0</license>
 	<description xml:lang="en">Preview your Adsense earnings in an Opera Speed Dial.</description>
 </widget>
