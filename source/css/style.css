@@ -58,7 +58,7 @@ span {
 }
 #msg {
 	font-size:60%;
-	color:#000;
+	color:#A8A8A8;
 }
 dt {
     font-weight:bold;
@@ -94,11 +94,11 @@ dd {
 	display:block;
 }
 
-#rateSlides dd span.stronger {	
+#rateSlides dt span.up {	
 	color:green;
 }
 
-#rateSlides dd span.weaker {	
+#rateSlides dt span.down {	
 	color:red;
 }
 
