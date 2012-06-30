@@ -1,0 +1,136 @@
+/*  This file is part of Google Adsense Monitor. Google Adsense Monitor
+	is an Opera extension that lets you view updates to your latest 
+	adsense earnings in an Opera Speed Dial.
+	
+    Copyright (C) 2012 M Shabeer Ali
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	
+	Website: http://adsensemonitor.tumblr.com/
+	Source code: https://github.com/thewebdev/opera-extension-am.git
+	Email: thewebdev@myopera.com */
+	
+/* RESET */
+* {
+    margin:0;
+    padding:0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size:0.8em;
+    line-height:1.5;
+}
+
+html {
+    height:100%;
+}
+body {
+    background:#fff;
+    color:#898989;
+    display:table;
+    height:100%;
+    width:100%;
+}
+span {
+	color: #000;
+	text-shadow: 0px 1px 1px #5D5D5D;
+}
+#output {
+	display:table-cell;
+    text-align:center;
+    vertical-align:middle;
+}
+#output img {
+	text-align:center;
+	vertical-align:middle;
+}
+#msg {
+	font-size:60%;
+	color:#000;
+}
+dt {
+    font-weight:bold;
+}
+
+dd {
+    font-weight:bold;
+}
+
+/* SLIDESHOW */
+#data {
+	display:none;
+}
+
+#rateSlides {
+	display:block;
+}
+
+#rateSlides dt { 
+	display:none;
+}
+
+#rateSlides dd {
+	display:none;
+}
+
+#rateSlides dt.current { 
+	display:block;
+}
+
+#rateSlides dd.current { 
+	display:block;
+}
+
+#rateSlides dd span.stronger {	
+	color:green;
+}
+
+#rateSlides dd span.weaker {	
+	color:red;
+}
+
+/* Styles here are only applied in a "minimized" state */
+@media screen and (view-mode: minimized) {
+  output {
+    font-size: 1.8em;
+  }
+}
+
+/* Change the font size based on the available width */
+@media screen and (view-mode: minimized) and (min-width:6em) {
+    body {
+        font-size:1em;
+    }
+}
+@media screen and (view-mode: minimized) and (min-width:7.2em) {
+    body {
+        font-size:1.2em;
+    }
+}
+@media screen and (view-mode: minimized) and (min-width:9em) {
+    body {
+        font-size:1.5em;
+    }
+}
+@media screen and (view-mode: minimized) and (min-width:12em) {
+    body {
+        font-size:2em;
+    }
+}
+@media screen and (view-mode: minimized) and (min-width:18em) {
+    body {
+        font-size:3em;
+    }
+}
