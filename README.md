@@ -12,7 +12,7 @@ Google Adsense Monitor is an Opera extension that lets you view updates to your 
 The extension doesn't handle your Google Adsense login and thus never needs to know your sign in email or password. It also doesn't store your sign in details anywhere.   
 
 2. **Simple, Effective Design**  
-The colours indicate whether your earnings have improved or not. Red indicates a drop in earning, while green indicates an improvement.
+The colour of the earning data indicate whether your earnings have improved or not. Red indicates a drop in earning, while green indicates an improvement.
 
 3. **Automatic Updates**  
 Once you have logged in, Google Adsense Monitor downloads new Adsense earnings data every 15 minutes.
