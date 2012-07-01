@@ -14,7 +14,7 @@
 		<!-- Link to open when the Speed Dial is clicked -->
 		<param name="url" value="http://adsense.google.com"/>
 	</feature>
-	<preference name="interval" value="30"/>
+	<preference name="interval" value="15"/>
 	<preference name="showfor" value="4"/>
 	<feature name="opera:share-cookies" required="true"/>
 	<access origin="http://google.com/" subdomains="true"/>
