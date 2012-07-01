@@ -58,14 +58,16 @@ span {
 }
 #msg {
 	font-size:60%;
-	color:#A8A8A8;
+	color:#2F2F2F;
 }
 dt {
     font-weight:bold;
 }
 
 dd {
-	color: #A8A8A8;
+	text-transform: uppercase;
+	color: #2F2F2F;
+	font-size: 0.5em;
     font-weight:bold;
 }
 
@@ -104,34 +106,22 @@ dd {
 
 /* Styles here are only applied in a "minimized" state */
 @media screen and (view-mode: minimized) {
-  output {
-    font-size: 1.8em;
-  }
+  output { font-size: 1.8em; }
 }
 
 /* Change the font size based on the available width */
 @media screen and (view-mode: minimized) and (min-width:6em) {
-    body {
-        font-size:1em;
-    }
+    body { font-size:1em; }
 }
 @media screen and (view-mode: minimized) and (min-width:7.2em) {
-    body {
-        font-size:1.2em;
-    }
+    body { font-size:1.2em; }
 }
 @media screen and (view-mode: minimized) and (min-width:9em) {
-    body {
-        font-size:1.5em;
-    }
+    body { font-size:1.5em; }
 }
 @media screen and (view-mode: minimized) and (min-width:12em) {
-    body {
-        font-size:2em;
-    }
+    body { font-size:2em; }
 }
 @media screen and (view-mode: minimized) and (min-width:18em) {
-    body {
-        font-size:3em;
-    }
+    body { font-size:3em; }
 }
