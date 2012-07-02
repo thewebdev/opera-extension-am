@@ -19,6 +19,8 @@ Once you have logged in, Google Adsense Monitor downloads new Adsense earnings d
 
 ## Note
 
-1. After logging into the Google Adsense control panel, please remeber not to sign out. Just close the tab.
+1. After logging into the Google Adsense control panel, don't sign out. Just close the tab.
 
 2. After you login, it will take atleast 2 minutes for the data to be updated and displayed in the Speed Dial. 
+
+3. The upward (indicated by green colour) and the downward (indicated by the red colour) swing of the earnings data is based on the comparison with the previous period's earning (i.e. todays earning is compared with yesterday's, and this months earning is compared with last month's).
