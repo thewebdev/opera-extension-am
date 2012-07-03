@@ -1,7 +1,7 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
 <widget 
 	xmlns="http://www.w3.org/ns/widgets" 
-	id="https://addons.opera.com/extensions/details/adsense-monitor/" 
+	id="https://addons.opera.com/extensions/details/google-adsense-monitor/" 
 	defaultlocale="en" 
 	viewmodes="minimized" 
 	version="1.0">
@@ -19,6 +19,7 @@
 	<feature name="opera:share-cookies" required="true"/>
 	<access origin="http://google.com/" subdomains="true"/>
 	<access origin="https://google.com/" subdomains="true"/>
+	<update-description href="https://extension-updates.opera.com/api/w3c-wd1/update/c2885050-a794-4440-b68a-f9b9a019496c/"/>	
 	<license href="http://www.gnu.org/licenses/gpl-3.0.html">Licensed under GPL v3.0</license>
 	<description xml:lang="en">Preview your Adsense earnings in an Opera Speed Dial.</description>
 </widget>
