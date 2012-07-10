@@ -7,7 +7,7 @@ Google Adsense Monitor is an Opera extension that lets you view updates to your 
 	Source: https://github.com/thewebdev/opera-extension-am.git
 	Email: thewebdev@myopera.com
 
-## Features - Version 1
+## Features  
 
 1. **Safe and Secure**  
 The extension doesn't need to know your sign in email or password, and doesn't involve itself with the login process. It also doesn't store your sign in details anywhere nor does it share your Adsense data with any other website.
