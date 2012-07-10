@@ -146,7 +146,7 @@ function extract(input) {
 	var login;
 	var div;
 	var gcode;
-	var now, y, tm, lm, dComp, mComp;
+	var now, y, tm, lm, dComp, mComp, tue, te;
 	var out = [];
 	
 	if (input) {
@@ -211,11 +211,22 @@ function extract(input) {
 				mComp = "down";
 			} else {
 				mComp = "up";
-			}			
+			}	
+
+			/* get total unpaid earnings - this
+			   is slightly tricky as there is no
+			   obvious id to search for this data */
+			
+			tue = div.querySelectorAll('ul.metrics-list li:first-of-type span.value');
+			te = tue[1].firstChild.nodeValue;
+			
+			y = 'yesterday: ' + y;
+			lm = 'last month: ' + lm;
 			
 			/* prepare for output */
-			out = [[now, dComp, 'yesterday', y], 
-				   [tm, mComp, 'last month', lm]];
+			out = [[now, dComp, y], 
+				   [tm, mComp, lm],
+				   [te, 'up', 'unpaid earnings']];
 				   
 			refDial('show', out);
 		}
@@ -287,7 +298,7 @@ function refDial(cmd, out) {
 				/*  reset css class */
 				dd[o].className = "";	
 				/*  assign the new data */				
-				dd[o].innerHTML = out[o][2] + ': ' + out[o][3];
+				dd[o].innerHTML = out[o][2];
 			}			
 		}
 		
