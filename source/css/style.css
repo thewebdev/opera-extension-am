@@ -47,6 +47,12 @@ span {
 	color: #000;
 	text-shadow: 0px 1px 1px #5D5D5D;
 }
+span.etype {
+	color: #A4A4A4;
+	font-size:0.4em;
+	text-transform: uppercase;
+	text-shadow: none;
+}
 #output {
 	display:table-cell;
     text-align:center;
