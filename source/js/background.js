@@ -224,9 +224,9 @@ function extract(input) {
 			lm = 'last month: ' + lm;
 			
 			/* prepare for output */
-			out = [[now, dComp, y], 
-				   [tm, mComp, lm],
-				   [te, 'up', 'unpaid earnings']];
+			out = [['today', dComp, now, y], 
+				   ['this month', mComp, tm, lm],
+				   ['total', 'up', te, 'unpaid earnings']];
 				   
 			refDial('show', out);
 		}
@@ -291,14 +291,14 @@ function refDial(cmd, out) {
 				/*  reset css class */
 				dt[o].className = "";
 				/*  assign the new data */
-				dt[o].innerHTML = '<span class="' + out[o][1] + '">' +  out[o][0] + '<span>';
+				dt[o].innerHTML = '<span class="etype">' + out[o][0] + '</span><br /><span class="' + out[o][1] + '">' +  out[o][2] + '<span>';
 			} 
 			
 			if (dd[o]) {
 				/*  reset css class */
 				dd[o].className = "";	
 				/*  assign the new data */				
-				dd[o].innerHTML = out[o][2];
+				dd[o].innerHTML = out[o][3];
 			}			
 		}
 		
