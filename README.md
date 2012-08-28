@@ -16,7 +16,10 @@ The extension doesn't need to know your sign in email or password, and doesn't i
 The colour of the earning data indicate whether your earnings have improved or not. Red indicates a drop in earning, while green indicates an improvement.
 
 3. **Automatic Updates**  
-Once you have logged in, Google Adsense Monitor downloads new Adsense earnings data every 15 minutes.
+Once you have logged in, Google Adsense Monitor downloads new Adsense earnings data every 15 minutes.  
+
+4. **Customize**  
+Displays daily, monthly and / or total unpaid earnings data, as per your preference.  
 
 ## Usage
 
