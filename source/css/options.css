@@ -1,0 +1,84 @@
+﻿/*
+	This file is part of Google Adsense Monitor. Google Adsense Monitor
+	is an Opera extension that lets you view updates to your latest 
+	adsense earnings in an Opera Speed Dial.
+	
+    Copyright (C) 2012 M Shabeer Ali
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	
+	Website: http://adsensemonitor.tumblr.com/
+	Source code: https://github.com/thewebdev/opera-extension-am.git
+	Email: thewebdev@myopera.com  */
+	
+/* RESET */
+body {
+	font-family:"Helvetica Neue", "Free Sans", Arial, Helvetica, sans-serif;
+    font-size:0.7em;
+    line-height:1.5;	
+}
+label {
+	font-weight: bold;
+}
+h1 {
+	margin: 1px;
+	text-align:center;
+	font-size:1.5em;
+	text-transform: uppercase;
+}
+h2 {
+	margin: 1px;
+	text-align:left;
+	font-size:1.2em;
+}
+a:link, a:visited, a:active {
+	margin-right: 4px;
+	padding: 0px 3px;
+	color: #0644D4;
+	text-decoration:none;
+	font-weight: bold;
+	border: none;
+}
+#options {
+	width: 450px;
+}
+#msg {
+	display: none;
+	margin: 1px;
+	padding: 1px;
+	width: 450px;
+	color: #FFF;
+	text-align: center;
+	font-weight: bold;
+	background: #BC0808;
+	border-radius: 4px;
+}
+#input label {
+	padding:2px;
+} 
+.optval {
+	margin: 1px;
+	padding: 6px 5px;
+	border-top: thin dotted #CCC;
+}
+.mid {
+	margin: 1px;
+	padding: 5px;
+	text-align: center;
+}
+#web {
+	margin: 1px;
+	padding: 5px;	
+	text-align: center;
+}
