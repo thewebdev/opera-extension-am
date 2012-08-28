@@ -102,7 +102,7 @@ function load() {
 
 function submit() {
 	/* When ENTER key is pressed on any form input,
-	   the form got submitted and results in a 
+	   the form got submitted and resulted in a 
 	   page reload. However, it seems this form
 	   reload browser quirk, sometimes doesn't
 	   happen if there are more than one
