@@ -140,14 +140,19 @@ function createDl(kids) {
 function extract(input) {
 	/* Checks if user has logged into Google
 	   Adsense control panel. If logged in,
-	   scrape the earning data, else ask
+	   scrape the earnings data, else ask
 	   user to log in. */
 	   
 	var login;
 	var div;
 	var gcode;
 	var now, y, tm, lm, dComp, mComp, tue, te;
+	var eto, emo, etu;
 	var out = [];
+	
+	var edaily = parseInt(widget.preferences.edaily, 10);
+	var emonthly = parseInt(widget.preferences.emonthly, 10);
+	var etotal = parseInt(widget.preferences.etotal, 10);	
 	
 	if (input) {
 	/*  parse the scraped page we got from Google */
@@ -155,7 +160,7 @@ function extract(input) {
 		/* extract <body> element from scraped page */
 		gcode = input.substring(input.indexOf("<body>")+7, input.indexOf("</body>"));
 		
-		/* We extract data based on  the id's. 
+		/* We extract data based on the id's. 
 		   To do this efficiently, we use
 		   querySelector(), which works on DOM, 
 		   elements and document fragments. So we
@@ -170,7 +175,7 @@ function extract(input) {
 		login = div.querySelector("#gaia_loginform");
 		
 		if (login) {		
-			/* login form detercted */
+			/* login form detected */
 			
 			/* inform user to login */
 			refDial('login');
@@ -189,45 +194,63 @@ function extract(input) {
 			clearInterval(timeIt);   
 			timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);	
 			
-			/* extract the earning data using the 
-			   obvious id's */
-			   
-			now = div.querySelector("#earnings-today").firstChild.nodeValue;
-			y = div.querySelector("#earnings-yesterday").firstChild.nodeValue;
-			tm = div.querySelector("#earnings-this-month").firstChild.nodeValue;
-			lm = div.querySelector("#earnings-last-month").firstChild.nodeValue;
-			
-			/* check if earning data is more or
-			   less than previous day's earning */
-			if ((parseFloat(now.substr(1))) < (parseFloat(y.substr(1)))) {
-				dComp = "down";
-			} else {
-				dComp = "up";
-			}
-
-			/* check if earning data is more or
-			   less than previous month's earning */			
-			if ((parseFloat(tm.substr(1))) < (parseFloat(lm.substr(1)))) {
-				mComp = "down";
-			} else {
-				mComp = "up";
-			}	
-
-			/* get total unpaid earnings - this
-			   is slightly tricky as there is no
-			   obvious id to search for this data */
-			
-			tue = div.querySelectorAll('ul.metrics-list li:first-of-type span.value');
-			te = tue[1].firstChild.nodeValue;
-			
-			y = 'yesterday: ' + y;
-			lm = 'last month: ' + lm;
-			
-			/* prepare for output */
-			out = [['today', dComp, now, y], 
-				   ['this month', mComp, tm, lm],
-				   ['total', 'up', te, 'unpaid earnings']];
+			if (edaily) {
+				/* Daily earnings data */
+				
+				/* extract the earning data using the 
+				   obvious id's */
 				   
+				now = div.querySelector("#earnings-today").firstChild.nodeValue;
+				y = div.querySelector("#earnings-yesterday").firstChild.nodeValue;
+
+				/* check if earning data is more or
+				   less than previous day's earning */
+				if ((parseFloat(now.substr(1))) < (parseFloat(y.substr(1)))) {
+					dComp = "down";
+				} else {
+					dComp = "up";
+				}
+				
+				y = 'yesterday: ' + y;
+				eto = ['today', dComp, now, y];
+				out.push(eto);
+			}
+			
+			if (emonthly) {
+				/* Daily earnings data */
+				
+				/* extract the earning data using the 
+				   obvious id's */
+				   
+				
+				tm = div.querySelector("#earnings-this-month").firstChild.nodeValue;
+				lm = div.querySelector("#earnings-last-month").firstChild.nodeValue;
+		
+
+				/* check if earning data is more or
+				   less than previous month's earning */			
+				if ((parseFloat(tm.substr(1))) < (parseFloat(lm.substr(1)))) {
+					mComp = "down";
+				} else {
+					mComp = "up";
+				}	
+
+				lm = 'last month: ' + lm;
+				emo = ['this month', mComp, tm, lm];
+				out.push(emo);
+			}
+			
+			if (etotal){
+				/* get total unpaid earnings - this
+				   is slightly tricky as there is no
+				   obvious id to search for this data */
+				
+				tue = div.querySelectorAll('ul.metrics-list li:first-of-type span.value');
+				te = tue[1].firstChild.nodeValue;
+				etu = ['total', 'up', te, 'unpaid earnings'];
+				out.push(etu);
+			}
+			
 			refDial('show', out);
 		}
 	}
