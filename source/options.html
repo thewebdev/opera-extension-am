@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--  
+	This file is part of Google Adsense Monitor. Google Adsense Monitor
+	is an Opera extension that lets you view updates to your latest 
+	adsense earnings in an Opera Speed Dial.
+	
+    Copyright (C) 2012 M Shabeer Ali
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	
+	Website: http://adsensemonitor.tumblr.com/
+	Source code: https://github.com/thewebdev/opera-extension-am.git
+	Email: thewebdev@myopera.com
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+<title>Google Adsense Monitor Options</title>
+<link href="css/options.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="js/options.js"></script>
+</head>
+
+<body>
+<div id="options">
+	<h1>Google Adsense Monitor Preferences</h1>	
+	<div class="optval"></div>
+		<h2>Display:</h2>
+		<ul id="set"></ul>
+	<form name="input" id="input" action="javascript:void(0);">
+		<div class="optval">
+			&nbsp; &nbsp; &nbsp; &nbsp;
+			<input type="checkbox" name="eto" id="eto" />
+			<label for="eto">Daily Earnings</label>				
+			
+			&nbsp; &nbsp;
+			<input type="checkbox" name="emo" id="emo" />
+			<label for="emo">Monthly Earnings</label>
+
+			&nbsp; &nbsp;
+			<input type="checkbox" name="etu" id="etu" />
+			<label for="etu">Total Unpaid Earnings</label>			
+		</div>		
+		<div class="optval submit">
+			<input type="button" id="apply" value="Save All Changes" />
+		</div>
+	</form>	
+</div>
+<div id="msg">Loading</div>
+<div id="web">
+	<a href="http://adsensemonitor.tumblr.com/submit">(Online Support)</a>
+</div>
+</body>
+</html>
