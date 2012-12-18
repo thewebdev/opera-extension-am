@@ -10,6 +10,7 @@
 	<author email="thewebdev@myopera.com">M Shabeer Ali</author>
 	<!-- original icon credit - http://dakirby309.deviantart.com/ -->
 	<icon src="pix/icon-64.png"/>
+	<icon src="pix/icon-128.png"/>
 	<feature name="opera:speeddial" required="true">
 		<!-- Link to open when the Speed Dial is clicked -->
 		<param name="url" value="http://adsense.google.com"/>
