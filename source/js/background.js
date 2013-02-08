@@ -3,7 +3,7 @@
 	adsense earnings in an Opera Speed Dial.
 
 	
-    Copyright (C) 2012 M Shabeer Ali
+    Copyright (C) 2013 M Shabeer Ali
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
