@@ -31,6 +31,8 @@ Displays daily, monthly and / or total unpaid earnings data, as per your prefere
 
 Version 1.6 -  
 New: Extension icon for Mac / Retina displays.  
+Updated: Copyright year to 2013.  
+Updated: Extension 'promo tag' in preferences.  
 
 Version 1.5 -  
 New: Preferences allows user to select the earnings data he / she wants to view.  
