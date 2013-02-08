@@ -26,3 +26,17 @@ Displays daily, monthly and / or total unpaid earnings data, as per your prefere
 1. After logging into Google Adsense, don't sign out - just close the tab. Please note that it will take at least 2 minutes, after sign in, for the data to be updated and displayed in the Speed Dial.
 
 2. The upward and the downward swing (indicated by the green and red colour, respectively) of the earnings data is based on the comparison with the previous period's earning (i.e. today's earning is compared with yesterday's, and this month's earning is compared with last month's).
+
+## Changelog
+
+Version 1.6 -  
+New: Extension icon for Mac / Retina displays.  
+
+Version 1.5 -  
+New: Preferences allows user to select the earnings data he / she wants to view.  
+
+Version 1.2 -  
+Display design updated to provide more context.
+
+Version 1.1 -  
+New: Displays 'Total Unpaid Earnings' too.
