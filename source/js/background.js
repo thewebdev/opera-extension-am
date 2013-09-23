@@ -24,6 +24,7 @@
 
 var timeIt = null; // data refresh timer
 var slider; // slide time delay
+var data; // scraped adsense page
 
 function $(v) {
 	/* DOM: identifies element */
@@ -198,7 +199,7 @@ function extract(input) {
 				/* Daily earnings data */
 				
 				/* extract the earning data using the 
-				   obvious id's */
+				   obvious ids */
 				   
 				now = div.querySelector("#earnings-today").firstChild.nodeValue;
 				y = div.querySelector("#earnings-yesterday").firstChild.nodeValue;
@@ -262,7 +263,6 @@ function scrape() {
 	/* Scrape the mobile version of 
 	   Google Adsense Control Panel. */
 	
-	var data;
 	var url = "https://www.google.com/adsense/v3/m/home";
 	
 	refDial('wait');
@@ -469,16 +469,47 @@ function startSlide(count) {
 	tempDd = null;
 }
 
+function reconfigure(e) {
+	/* This code didn't work as expected.
+	   Needs more testing to figure out if
+	   it was some opera bug. It's here as 
+	   as a stub for future versions.
+	   It is meant to update the speed dial
+	   with the new options set by the user. */
+	
+	var gac = data;
+	if (e.storageArea != widget.preferences) return;
+	switch(e.key) {
+		case 'interval': setRefreshTimer(); break;
+		case 'showfor': setDisplayTimer(); break;
+		case 'edaily': extract(gac); break;
+		case 'emonthly': extract(gac); break;
+		case 'etotal': extract(gac); break;
+	}
+}
+
+function setRefreshTimer() {
+	clearInterval(timeit);
+	timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
+}
+
+function setDisplayTimer() {
+	clearInterval(slider);
+	slider = setInterval(startSlide, parseInt((widget.preferences.showfor), 10) * 1000);
+}
+
 function init() {
 	/* some basic settings intialised here
 	   to get the extension running */
-		
+
+	/* monitors if options are updated and 
+	   saved in widget preferences. */
+	window.addEventListener('storage', reconfigure, false);	   
 	
 	/* The 'interval' key in the preferences 
 	   specifies the delay between updates.
 	   Unit: minute */
 	timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
-	
 	scrape();
 }
 
