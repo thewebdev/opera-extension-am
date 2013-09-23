@@ -23,6 +23,7 @@
 	<preference name="edaily" value="1"/>
 	<preference name="emonthly" value="1"/>
 	<preference name="etotal" value="1"/>
+	<preference name="slideshow" value="1"/>
 	<preference name="interval" value="20"/>
 	<preference name="showfor" value="3"/>	
 	<update-description href="https://extension-updates.opera.com/api/w3c-wd1/update/c2885050-a794-4440-b68a-f9b9a019496c/"/>	
