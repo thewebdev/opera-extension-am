@@ -53,6 +53,13 @@ span.etype {
 	text-transform: uppercase;
 	text-shadow: none;
 }
+span.up {	
+	color:green;
+}
+
+span.down {	
+	color:red;
+}
 #output {
 	display:table-cell;
     text-align:center;
@@ -102,13 +109,44 @@ dd {
 	display:block;
 }
 
-#rateSlides dt span.up {	
-	color:green;
+/* Definition list as a table */
+/* See: http://www.maxdesign.com.au/articles/definition/ */
+
+dl.table-display {
+	float: left;
+	margin: 2px 0;
+	padding: 0;
+	border-bottom: 1px solid #999;	
+	width: 100%;
 }
 
-#rateSlides dt span.down {	
-	color:red;
+.table-display dt {
+	clear: left;
+	float: left;
+	width: 30%;
+	margin: 0 0 0 4px;
+	padding: 5px;
+	border-top: 1px solid #999;
+	font-size: 0.6em;
 }
+
+.table-display dt span.ttitle {
+	color: #A4A4A4;
+	font-size:0.8em;
+	text-transform: uppercase;
+	text-shadow: none;
+}
+	
+.table-display dd {
+	float: left;
+	width: 61%;
+	margin: 0;
+	border-top: 1px solid #999;
+	font-size: 0.6em;
+	font-weight: normal;
+	text-transform: none;
+}
+
 
 /* Styles here are only applied in a "minimized" state */
 @media screen and (view-mode: minimized) {
