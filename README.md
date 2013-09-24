@@ -7,6 +7,8 @@ Google Adsense Monitor is an Opera extension that lets you view updates to your 
 	Source: https://github.com/thewebdev/opera-extension-am.git
 	Email: thewebdev@myopera.com
 
+**Note**: This version of Google Adsense Monitor is for Opera 12.16 (Presto engine) or below only.  
+
 ## Features  
 
 1. **Safe and Secure**  
@@ -19,7 +21,7 @@ The colour of the earning data indicate whether your earnings have improved or n
 Once you have logged in, Google Adsense Monitor downloads new Adsense earnings data every 15 minutes.  
 
 4. **Customisable**  
-Displays daily, monthly and / or total unpaid earnings data, as per your preference.  
+Change display timings, data update intervals and options to view daily, monthly and / or total unpaid earnings data, as per your preference.   
 
 ## Usage
 
@@ -28,6 +30,10 @@ Displays daily, monthly and / or total unpaid earnings data, as per your prefere
 2. The upward and the downward swing (indicated by the green and red colour, respectively) of the earnings data is based on the comparison with the previous period's earning (i.e. today's earning is compared with yesterday's, and this month's earning is compared with last month's).
 
 ## Changelog
+
+Version 1.8 -  
+New: Display all earnings data in one view.  
+New: Options to control display & update timings.  
 
 Version 1.6 -  
 New: Extension icon for Mac / Retina displays.  

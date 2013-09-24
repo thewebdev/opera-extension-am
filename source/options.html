@@ -34,9 +34,9 @@
 <body>
 <div id="options">
 	<h1>Google Adsense Monitor Preferences</h1>	
-	<div class="optval"></div>
+	<div class="optval">
 		<h2>Display:</h2>
-		<ul id="set"></ul>
+	</div>		
 	<form name="input" id="input" action="javascript:void(0);">
 		<div class="optval">
 			&nbsp; &nbsp; &nbsp; &nbsp;
@@ -50,22 +50,38 @@
 			&nbsp; &nbsp;
 			<input type="checkbox" name="etu" id="etu" />
 			<label for="etu">Total Unpaid Earnings</label>			
+		</div>
+		<div class="optval">
+			&nbsp; &nbsp; &nbsp; &nbsp;
+			<input type="checkbox" name="ass" id="ass" />
+			<label for="ass">Display each selected earnings data separately</label>		
+		</div>
+		<div class="optval">
+			<h2>Timings:</h2>
 		</div>		
+		<div class="optval">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<label for="interval">Get updates every:</label>
+			<input type="text" name="interval" id="interval" size="2" />
+			<em> minutes &nbsp; &nbsp; &nbsp;</em>	
+			<label for="delay">Display each data for:</label>
+			<input type="text" name="delay" id="delay" size="2" /> 
+			<em>seconds</em>			
+		</div>			
 		<div class="optval mid">
-			<input type="button" id="apply" value="Save All Changes" />
+			<input type="button" id="apply" value="Save All Changes" /><br />
+			<a href="http://adsensemonitor.tumblr.com/submit">(Online Support)</a>
 		</div>
 	</form>
 </div>
 <div id="msg">Loading</div>
-<div id="web">
-	<a href="http://adsensemonitor.tumblr.com/submit">(Online Support)</a>
-</div>
 <div class="mid"><br />
+	Try these Opera
 	<a href="https://addons.opera.com/extensions/details/instant-currency-rates/">
 	<img src="/pix/icon-icr.png" width="48" height="48" alt="Instant Currency Rate" /></a>
 	<a href="https://addons.opera.com/extensions/details/the-reminder/">
 	<img src="/pix/icon-reminder.png" width="48" height="48" alt="The Reminder" /></a>
+	Extensions too.
 </div>
-<div class="optval mid">Try these Opera Extensions too! </div>
 </body>
 </html>

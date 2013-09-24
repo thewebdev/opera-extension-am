@@ -73,12 +73,11 @@ a:link, a:visited, a:active {
 	border-top: thin dotted #CCC;
 }
 .mid {
-	margin: 1px;
-	padding: 5px;
+	padding: 4px;
 	text-align: center;
 }
 #web {
 	margin: 1px;
-	padding: 5px;	
+	padding: 1px;	
 	text-align: center;
 }
