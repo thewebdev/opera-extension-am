@@ -119,7 +119,9 @@ function apply() {
 	widget.preferences.etotal = checketu;
 	widget.preferences.slideshow = checkass;
 	widget.preferences.interval = i;
-	widget.preferences.showfor = d;
+	if (checkass) {
+		widget.preferences.showfor = d;
+	}
 	
 	status("All changes saved.");
 
@@ -151,11 +153,25 @@ function load() {
 	document.input.delay.value = showfor;	
 }
 
+function disable() {
+	var checked;
+	
+	checked = document.input.ass.checked;
+	checked = checked ? 1 : 0;
+	
+	if (!checked) {
+		document.input.delay.disabled = true;
+	} else {
+		document.input.delay.disabled = false;
+	}
+}
+
 function init() {
 	/* some basic settings intialised here */
 	
-	/* monitor button click */
+	/* monitor clicks */
 	$('apply').addEventListener('click', apply, false);
+	$('ass').addEventListener('click', disable, false);
 	
 	load();
 }
