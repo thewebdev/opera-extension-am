@@ -141,9 +141,6 @@ function apply() {
 	}	
 	
 	status("All changes saved.");
-
-	/* reload dial with new settings */		
-	// opera.extension.bgProcess.init();	
 	
 	return;
 }
