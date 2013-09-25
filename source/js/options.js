@@ -69,7 +69,10 @@ function apply() {
 	checketu = checketu ? 1 : 0;
 	
 	checkass = document.input.ass.checked;
-	checkass = checkass ? 1 : 0;	
+	checkass = checkass ? 1 : 0;
+	
+	checkalc = document.input.alc.checked;
+	checkalc = checkalc ? 1 : 0;
 
 	/* Validate - Atleast one item 
 	   needs to be displayed. */
@@ -119,9 +122,23 @@ function apply() {
 	widget.preferences.etotal = checketu;
 	widget.preferences.slideshow = checkass;
 	widget.preferences.interval = i;
+	widget.preferences.convert = checkalc;
+	
 	if (checkass) {
 		widget.preferences.showfor = d;
 	}
+	
+	if (checkalc) {
+	
+		var arc = document.input.first.value;
+		var luc = document.input.second.value;
+		
+		// Adsense Report Currency
+		widget.preferences.arc = arc;
+		
+		//Local User Currency
+		widget.preferences.luc = luc ;
+	}	
 	
 	status("All changes saved.");
 
@@ -150,7 +167,25 @@ function load() {
 	if (slideshow) {document.input.ass.checked = true;	}	
 	
 	document.input.interval.value = interval;
-	document.input.delay.value = showfor;	
+	document.input.delay.value = showfor;
+	
+	disable();
+	nocurrency();
+}
+
+function nocurrency() {
+	var checked;
+	
+	checked = document.input.alc.checked;
+	checked = checked ? 1 : 0;
+	
+	if (checked) {
+		document.input.first.disabled = false;
+		document.input.second.disabled = false;	
+	} else {
+		document.input.first.disabled = true;
+		document.input.second.disabled = true;
+	}
 }
 
 function disable() {
@@ -172,6 +207,7 @@ function init() {
 	/* monitor clicks */
 	$('apply').addEventListener('click', apply, false);
 	$('ass').addEventListener('click', disable, false);
+	$('alc').addEventListener('click', nocurrency, false);
 	
 	load();
 }
