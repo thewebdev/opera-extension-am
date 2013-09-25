@@ -22,6 +22,8 @@
 	Email: thewebdev@myopera.com 
 */
 
+var update = 0;
+
 function $(v) {
 	if (document.getElementById(v)) {
 		return document.getElementById(v);
@@ -138,7 +140,14 @@ function apply() {
 		
 		//Local User Currency
 		widget.preferences.luc = luc ;
-	}	
+		
+		opera.extension.bgProcess.scrape();
+	}
+	
+	if (checkalc !== update) {
+		update = checkalc;
+		opera.extension.bgProcess.scrape();
+	}
 	
 	status("All changes saved.");
 	
@@ -157,26 +166,36 @@ function load() {
 	var interval = widget.preferences.interval;
 	var showfor = widget.preferences.showfor;
 	
+	var convert = parseInt(widget.preferences.convert, 10);
+	
 	
 	if (edaily) { document.input.eto.checked = true; } 
 	if (emonthly) { document.input.emo.checked = true; } 
 	if (etotal) {document.input.etu.checked = true;	}
-	if (slideshow) {document.input.ass.checked = true;	}	
+	if (slideshow) {document.input.ass.checked = true; }	
+	
+	if (convert) {
+		update = 1;
+		document.input.alc.checked = true; 
+	}
 	
 	document.input.interval.value = interval;
 	document.input.delay.value = showfor;
+
+	$('first').value = widget.preferences.arc;
+	$('second').value = widget.preferences.luc;
 	
 	disable();
 	nocurrency();
 }
 
 function nocurrency() {
-	var checked;
+	var check;
 	
-	checked = document.input.alc.checked;
-	checked = checked ? 1 : 0;
+	check = document.input.alc.checked;
+	check = check ? 1 : 0;
 	
-	if (checked) {
+	if (check) {
 		document.input.first.disabled = false;
 		document.input.second.disabled = false;	
 	} else {
@@ -186,12 +205,12 @@ function nocurrency() {
 }
 
 function disable() {
-	var checked;
+	var check;
 	
-	checked = document.input.ass.checked;
-	checked = checked ? 1 : 0;
+	check = document.input.ass.checked;
+	check = check ? 1 : 0;
 	
-	if (!checked) {
+	if (!check) {
 		document.input.delay.disabled = true;
 	} else {
 		document.input.delay.disabled = false;
