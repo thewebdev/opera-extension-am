@@ -14,14 +14,17 @@ Google Adsense Monitor is an Opera extension that lets you view updates to your 
 1. **Safe and Secure**  
 The extension doesn't need to know your sign in email or password, and doesn't involve itself with the login process. It also doesn't store your sign in details anywhere nor does it share your Adsense data with any other website.
 
-2. **Simple, Effective Design**  
+2. **Earnings in your Currency**  
+Google Adsense Monitor can automatically convert and display your earnings in your local currency, if your Adsense report currency is either US dollars or Euro. (Warning: this is an experimental feature and may not always work or be error free).
+
+3. **Simple, Effective Design**  
 The colour of the earning data indicate whether your earnings have improved or not. Red indicates a drop in earning, while green indicates an improvement.
 
-3. **Automatic Updates**  
+4. **Automatic Updates**  
 Once you have logged in, Google Adsense Monitor downloads new Adsense earnings data every 15 minutes.  
 
-4. **Customisable**  
-Change display timings, data update intervals and options to view daily, monthly and / or total unpaid earnings data, as per your preference.   
+5. **Customisable**  
+Change display timings, data update intervals, options to view your earnings in different ways etc., as per your preference.   
 
 ## Usage
 
@@ -30,6 +33,10 @@ Change display timings, data update intervals and options to view daily, monthly
 2. The upward and the downward swing (indicated by the green and red colour, respectively) of the earnings data is based on the comparison with the previous period's earning (i.e. today's earning is compared with yesterday's, and this month's earning is compared with last month's).
 
 ## Changelog
+
+Version 12.01 -  
+New: (Experimental) Automatically converts earnings into local currency from USD or EUR.  
+New: Versioning process.
 
 Version 1.8 -  
 New: Display all earnings data in one view.  
