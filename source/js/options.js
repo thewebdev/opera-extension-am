@@ -22,6 +22,8 @@
 	Email: thewebdev@myopera.com 
 */
 
+var update = 0;
+
 function $(v) {
 	if (document.getElementById(v)) {
 		return document.getElementById(v);
@@ -69,7 +71,10 @@ function apply() {
 	checketu = checketu ? 1 : 0;
 	
 	checkass = document.input.ass.checked;
-	checkass = checkass ? 1 : 0;	
+	checkass = checkass ? 1 : 0;
+	
+	checkalc = document.input.alc.checked;
+	checkalc = checkalc ? 1 : 0;
 
 	/* Validate - Atleast one item 
 	   needs to be displayed. */
@@ -119,14 +124,32 @@ function apply() {
 	widget.preferences.etotal = checketu;
 	widget.preferences.slideshow = checkass;
 	widget.preferences.interval = i;
+	widget.preferences.convert = checkalc;
+	
 	if (checkass) {
 		widget.preferences.showfor = d;
 	}
 	
+	if (checkalc) {
+	
+		var arc = document.input.first.value;
+		var luc = document.input.second.value;
+		
+		// Adsense Report Currency
+		widget.preferences.arc = arc;
+		
+		//Local User Currency
+		widget.preferences.luc = luc ;
+		
+		opera.extension.bgProcess.scrape();
+	}
+	
+	if (checkalc !== update) {
+		update = checkalc;
+		opera.extension.bgProcess.scrape();
+	}
+	
 	status("All changes saved.");
-
-	/* reload dial with new settings */		
-	// opera.extension.bgProcess.init();	
 	
 	return;
 }
@@ -143,23 +166,51 @@ function load() {
 	var interval = widget.preferences.interval;
 	var showfor = widget.preferences.showfor;
 	
+	var convert = parseInt(widget.preferences.convert, 10);
+	
 	
 	if (edaily) { document.input.eto.checked = true; } 
 	if (emonthly) { document.input.emo.checked = true; } 
 	if (etotal) {document.input.etu.checked = true;	}
-	if (slideshow) {document.input.ass.checked = true;	}	
+	if (slideshow) {document.input.ass.checked = true; }	
+	
+	if (convert) {
+		update = 1;
+		document.input.alc.checked = true; 
+	}
 	
 	document.input.interval.value = interval;
-	document.input.delay.value = showfor;	
+	document.input.delay.value = showfor;
+
+	$('first').value = widget.preferences.arc;
+	$('second').value = widget.preferences.luc;
+	
+	disable();
+	nocurrency();
+}
+
+function nocurrency() {
+	var check;
+	
+	check = document.input.alc.checked;
+	check = check ? 1 : 0;
+	
+	if (check) {
+		document.input.first.disabled = false;
+		document.input.second.disabled = false;	
+	} else {
+		document.input.first.disabled = true;
+		document.input.second.disabled = true;
+	}
 }
 
 function disable() {
-	var checked;
+	var check;
 	
-	checked = document.input.ass.checked;
-	checked = checked ? 1 : 0;
+	check = document.input.ass.checked;
+	check = check ? 1 : 0;
 	
-	if (!checked) {
+	if (!check) {
 		document.input.delay.disabled = true;
 	} else {
 		document.input.delay.disabled = false;
@@ -172,6 +223,7 @@ function init() {
 	/* monitor clicks */
 	$('apply').addEventListener('click', apply, false);
 	$('ass').addEventListener('click', disable, false);
+	$('alc').addEventListener('click', nocurrency, false);
 	
 	load();
 }

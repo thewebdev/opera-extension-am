@@ -67,6 +67,9 @@ a:link, a:visited, a:active {
 #input label {
 	padding:2px;
 } 
+#input select {
+	margin:2px 2px 4px 2px;
+} 
 .optval {
 	margin: 1px;
 	padding: 6px 5px;

@@ -25,6 +25,7 @@
 var timeIt = null; // data refresh timer
 var slider; // slide time delay
 var data; // scraped adsense page
+var rate; // parsed currency rates
 
 function $(v) {
 	/* DOM: identifies element */
@@ -49,6 +50,14 @@ function hide(id) {
 
 function show(id) {
 	$(id).style.display = 'block';
+}
+
+function trueRound(value) {
+/*  Original code from stackoverflow.com 
+	Rounds a float to specified number of decimal places */
+
+	var digits = 2;
+    return (Math.round((value * Math.pow(10, digits)).toFixed(digits - 1)) / Math.pow(10, digits)).toFixed(digits);
 }
 
 function createDl(kids) {
@@ -158,6 +167,7 @@ function extract(input) {
 	var etotal = parseInt(widget.preferences.etotal, 10);
 	
 	var slideshow = parseInt(widget.preferences.slideshow, 10);
+	var convert = parseInt(widget.preferences.convert, 10);
 	
 	if (input) {
 	/*  parse the scraped page we got from Google */
@@ -171,7 +181,7 @@ function extract(input) {
 		   elements and document fragments. So we
 		   create an element, append the elements 
 		   from the scraped page and search for
-		   known id's using querySelector(). */
+		   known ids using querySelector(). */
 		   
 		div = E('div');
 		div.innerHTML = input;
@@ -216,6 +226,26 @@ function extract(input) {
 					dComp = "up";
 				}
 				
+				if (convert) {
+					now = now.trim();
+					y = y.trim();
+					
+					// remove dollar / euro symbol
+					now = now.slice(1);
+					y = y.slice(1);
+					
+					// convert to local currency
+					now = parseFloat(now) * rate;
+					y = parseFloat(y) * rate;
+					
+					// roundoff to 2 decimals
+					now = trueRound(now);
+					y = trueRound(y);
+					
+					now = String(now);
+					y = String(y);
+				}
+				
 				eto = ['today', dComp, now, 'yesterday', y];
 				out.push(eto);
 			}
@@ -237,7 +267,27 @@ function extract(input) {
 					mComp = "down";
 				} else {
 					mComp = "up";
-				}	
+				}
+				
+				if (convert) {
+					tm = tm.trim();
+					lm = lm.trim();
+					
+					// remove dollar / euro symbol
+					tm = tm.slice(1);
+					lm = lm.slice(1);
+					
+					// convert to local currency
+					tm = parseFloat(tm) * rate;
+					lm = parseFloat(lm) * rate;
+					
+					// roundoff to 2 decimals
+					tm = trueRound(tm);
+					lm = trueRound(lm);
+					
+					tm = String(tm);
+					lm = String(lm);
+				}				
 
 				emo = ['this month', mComp, tm, 'last month', lm];
 				out.push(emo);
@@ -250,6 +300,22 @@ function extract(input) {
 				
 				tue = div.querySelectorAll('ul.metrics-list li:first-of-type span.value');
 				te = tue[1].firstChild.nodeValue;
+				
+				if (convert) {
+					te = te.trim();
+					
+					// remove dollar / euro symbol
+					te = te.slice(1);
+					
+					// convert to local currency
+					te = parseFloat(te) * rate;
+					
+					// roundoff to 2 decimals
+					te = trueRound(te);
+					
+					te = String(te);
+				}				
+				
 				etu = ['total', 'up', te, 'unpaid earnings'];
 				out.push(etu);
 			}
@@ -265,7 +331,71 @@ function extract(input) {
 	return;
 }
 
-function scrape() {
+function converter(file, arc, luc) {
+	/* Currency conversion */
+	
+	var csv = file.split(/\r?\n/);
+	var rates;
+	
+	if (arc === 'USD') {
+		rates = csv[0].split(',');
+		rate = parseFloat(rates[1]);
+	}
+	
+	if (arc === 'EUR') {
+		rates = csv[0].split(',');
+		rates = rates.concat(csv[1].split(','));
+		rate = parseFloat(rates[3]) / parseFloat(rates[1]);
+	}
+	
+	return;
+}
+
+function getRates() {
+	/* Get currency rate from Yahoo! */
+	
+	var csvfile;
+	var query;
+	var url = 'http://download.finance.yahoo.com/d/quotes.csv?f=sl1&e=.cs&s=';
+	
+	refDial('wait');
+	
+	var arc = widget.preferences.arc;
+	var luc = widget.preferences.luc;
+	
+	if (arc === 'USD') {
+		query = arc + luc + '=X';
+	} 
+	
+	if (arc === 'EUR') {
+		query = 'USDEUR=X&s=USD' + luc + '=X';
+	}
+	
+	url = url + query;
+	
+	var ext = new XMLHttpRequest();
+
+	ext.open('GET', url, true);
+	
+	ext.onreadystatechange = function (event) {
+		if (this.readyState == 4) {
+			if (this.status == 200 && this.responseText) {
+				csvfile = this.responseText;
+				converter(csvfile, arc, luc);
+			} else {
+				/* possible network error -
+				   tell the user. */
+				
+				refDial('hang');
+			}
+		}
+	};
+
+	ext.send();
+	return;
+}
+
+function getReport() {
 	/* Scrape the mobile version of 
 	   Google Adsense Control Panel. */
 	
@@ -292,6 +422,18 @@ function scrape() {
 
 	ext.send();	
 	return data;
+}
+
+function scrape() {
+	/* get the data */
+	
+	var convert = parseInt(widget.preferences.convert, 10);
+	if (convert) {
+		getRates();
+	}
+	
+	getReport();
+	return;
 }
 
 function refDial(cmd, out) {
