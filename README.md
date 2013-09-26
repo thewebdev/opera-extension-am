@@ -34,6 +34,9 @@ Change display timings, data update intervals, options to view your earnings in 
 
 ## Changelog
 
+Version 12.10 -  
+Fixed: Revised versioning. (See Issue #10 ).  
+
 Version 12.01 -  
 New: (Experimental) Automatically converts earnings into local currency from USD or EUR.  
 New: Versioning process.  
