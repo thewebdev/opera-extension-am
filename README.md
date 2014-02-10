@@ -32,30 +32,33 @@ Change display timings, data update intervals, options to view your earnings in 
 
 2. The upward and the downward swing (indicated by the green and red colour, respectively) of the earnings data is based on the comparison with the previous period's earning (i.e. today's earning is compared with yesterday's, and this month's earning is compared with last month's).
 
-## Changelog
+## Changelog  
 
-Version 12.10 -  
+**Version 12.11** -  
+Updated: Added AZN to currency list.  
+
+**Version 12.10** -  
 Fixed: Revised versioning. (See Issue #10 ).  
 
-Version 12.01 -  
+**Version 12.01** -  
 New: (Experimental) Automatically converts earnings into local currency from USD or EUR.  
 New: Versioning process.  
 Fixed: Issue #7.  
 
-Version 1.8 -  
+**Version 1.8** -  
 New: Display all earnings data in one view.  
 New: Options to control display & update timings.  
 
-Version 1.6 -  
+**Version 1.6** -  
 New: Extension icon for Mac / Retina displays.  
 Updated: Copyright year to 2013.  
 Updated: Extension 'promo tag' in preferences.  
 
-Version 1.5 -  
+**Version 1.5** -  
 New: Preferences allows user to select the earnings data he / she wants to view.  
 
-Version 1.2 -  
+**Version 1.2** -  
 Display design updated to provide more context.
 
-Version 1.1 -  
+**Version 1.1** -  
 New: Displays 'Total Unpaid Earnings' too.
