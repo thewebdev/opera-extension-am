@@ -3,7 +3,7 @@
 	adsense earnings in an Opera Speed Dial.
 
 	
-    Copyright (C) 2013 M Shabeer Ali
+    Copyright (C) 2013 - 2014 M Shabeer Ali
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 	
 	Website: http://adsensemonitor.tumblr.com/
 	Source code: https://github.com/thewebdev/opera-extension-am.git
-	Email: thewebdev@myopera.com */
+	Email: thewebdev@yandex.com */
 
 var timeIt = null; // data refresh timer
 var slider; // slide time delay

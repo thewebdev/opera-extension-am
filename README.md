@@ -5,7 +5,7 @@ Google Adsense Monitor is an Opera extension that lets you view updates to your 
 	Download: https://addons.opera.com/extensions/details/google-adsense-monitor/
 	Website: http://adsensemonitor.tumblr.com/
 	Source: https://github.com/thewebdev/opera-extension-am.git
-	Email: thewebdev@myopera.com
+	Email: thewebdev@yandex.com
 
 **Note**: This version of Google Adsense Monitor is for Opera 12.16 (Presto engine) or below only.  
 
