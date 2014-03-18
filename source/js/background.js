@@ -174,6 +174,8 @@ function extract(input) {
 		
 		/* extract <body> element from scraped page */
 		gcode = input.substring(input.indexOf("<body>")+7, input.indexOf("</body>"));
+        opera.postError(gcode);
+        return;        
 		
 		/* We extract data based on the id's. 
 		   To do this efficiently, we use
@@ -395,33 +397,69 @@ function getRates() {
 	return;
 }
 
+function scrapeAPI(input) {
+    var lfedata, url, xhr, a, b, c, onLoad, data;
+    
+    lfedata = input.substring(input.indexOf("ads.adsense.lightfe.main.init")+31, input.indexOf("ads.adsense.lightfe.home.loadData"));
+    
+    //opera.postError("1: " + lfedata);
+    
+    lfedata = lfedata.split(",");
+    
+    lfedata[0] = lfedata[0].trim();
+    lfedata[1] = lfedata[1].trim();
+    lfedata[0] = lfedata[0].substring(lfedata[0].indexOf("\'")+1, lfedata[0].lastIndexOf("\'"));
+    lfedata[1] = lfedata[1].substring(lfedata[1].indexOf("\'")+1, lfedata[1].lastIndexOf("\'"));
+    
+    opera.postError("2: " + lfedata[0]);
+    opera.postError("3: " + lfedata[1]);
+    
+    url = "https://www.google.com/adsense/m/data/home?hl=" + lfedata[0];
+    xhr = new XMLHttpRequest();
+    
+    onLoad = function(e) {
+        data = e.target.responseText;
+        data = data.substring(data.indexOf("{"), data.length);
+        opera.postError("JSON: " + data);
+    };
+    
+    a = '';
+    c = ''+"="+b;
+    xhr.open('POST', url, true);
+    xhr.timeout = 10000;
+    xhr.withCredentials = true;
+    xhr.setRequestHeader("Referer", "https://www.google.com/adsense/m/");
+    xhr.setRequestHeader("Content-Length", "0");    
+    xhr.setRequestHeader("X-Lightfe-Auth", "1");
+    xhr.setRequestHeader("Client-Version", lfedata[1]);
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+    
+    xhr.send(c);
+    
+    xhr.onload = onLoad;
+}
+
 function getReport() {
 	/* Scrape the mobile version of 
 	   Google Adsense Control Panel. */
-	
-	var url = "https://www.google.com/adsense/v3/m/home";
+//
+	var url = "https://www.google.com/adsense/m/";
 	
 	refDial('wait');
-	var ext = new XMLHttpRequest();
-
-	ext.open('GET', url, true);
 	
-	ext.onreadystatechange = function (event) {
-		if (this.readyState == 4) {
-			if (this.status == 200 && this.responseText) {
-				data = this.responseText;
-				extract(data);
-			} else {
-				/* possible network error -
-				   tell the user. */
-				
-				refDial('hang');
-			}
-		}
+    var ext = new XMLHttpRequest();
+	ext.open('GET', url, true);
+    
+	ext.onload = function (event) {
+        if (this.status == 200) {
+            data = this.responseText;
+            //opera.postError("Scrape: " + data);
+            scrapeAPI(data);
+		  //extract(data);
+        }
 	};
 
-	ext.send();	
-	return data;
+	ext.send();
 }
 
 function scrape() {
@@ -433,7 +471,6 @@ function scrape() {
 	}
 	
 	getReport();
-	return;
 }
 
 function refDial(cmd, out) {
