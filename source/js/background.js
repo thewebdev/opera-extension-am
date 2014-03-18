@@ -1,8 +1,7 @@
-﻿/*  This file is part of Google Adsense Monitor. Google Adsense Monitor
+/*  This file is part of Google Adsense Monitor. Google Adsense Monitor
 	is an Opera extension that lets you view updates to your latest 
 	adsense earnings in an Opera Speed Dial.
 
-	
     Copyright (C) 2013 - 2014 M Shabeer Ali
 
     This program is free software: you can redistribute it and/or modify
@@ -22,6 +21,11 @@
 	Source code: https://github.com/thewebdev/opera-extension-am.git
 	Email: thewebdev@yandex.com */
 
+/*jslint plusplus: true, continue: true */
+/*global document: false, clearInterval: false, clearTimeout: false, setInterval: false, setTimeout: false, XMLHttpRequest: false, localStorage: false, window: false, chrome: false, opera: false, widget: false, ErrorEvent: false */
+
+"use strict";
+
 var timeIt = null; // data refresh timer
 var slider; // slide time delay
 var data; // scraped adsense page
@@ -34,12 +38,12 @@ function $(v) {
 	}
 }
 
-function E(v) {
+function e(v) {
 	/* DOM: creates new element */
 	return document.createElement(v);
 }
 
-function Txt(v) {
+function txt(v) {
 	/* DOM: creates text nodes */
 	return document.createTextNode(v);
 }
@@ -72,9 +76,10 @@ function createDl(kids) {
 	as it is faster to create the elements
 	separately and then add to the page. */
 	
-	var dl, dt, dd, txt, temp, temp1;
-	var inHtml = document.createDocumentFragment();
-	var list = $("rateSlides");
+	var dl, dt, dd, tx, temp, temp1, inHtml, list, z, a, x, i;
+	
+    inHtml = document.createDocumentFragment();
+	list = $("rateSlides");
 	
 	if ($("rateSlides")) {
 		/*  if dl node exists */
@@ -88,20 +93,20 @@ function createDl(kids) {
 		} else if (temp.length < kids) {
 			/*  add more dt dd nodes */
 			
-			var z = kids - temp.length;
+			z = kids - temp.length;
 			
-			for (var a = 0; a < z; a++) {
-				dt = E('dt');
-				txt = Txt('');
+			for (a = 0; a < z; a++) {
+				dt = e('dt');
+				tx = txt('');
 				dt.appendChild(txt);
 				
 				inHtml.appendChild(dt);
 				
-				dd = E('dd');
-				txt = Txt('');
+				dd = e('dd');
+				tx = txt('');
 				dd.appendChild(txt);
 				
-				inHtml.appendChild(dd);				
+				inHtml.appendChild(dd);
 			}
 			
 			$("rateSlides").appendChild(inHtml);
@@ -112,7 +117,7 @@ function createDl(kids) {
 			
 			temp1 = $("rateSlides").getElementsByTagName('dd');
 			
-			var x = temp.length - kids;
+			x = temp.length - kids;
 			
 			while (x !== 0) {
 				$("rateSlides").removeChild(temp[0]);
@@ -122,22 +127,22 @@ function createDl(kids) {
 			
 			return;
 		}
-	} 
+	}
 	
 	/*  create the list and add to the DOM */
 		
-	dl = E('dl');
+	dl = e('dl');
 	dl.setAttribute('id', 'rateSlides');
 	
-	for (var i = 0; i < kids; i++) {
-		dt = E('dt');
-		txt = Txt('');
+	for (i = 0; i < kids; i++) {
+		dt = e('dt');
+		tx = txt('');
 		dt.appendChild(txt);
 		
 		dl.appendChild(dt);
 		
-		dd = E('dd');
-		txt = Txt('');
+		dd = e('dd');
+		tx = txt('');
 		dd.appendChild(txt);
 		
 		dl.appendChild(dd);
@@ -149,34 +154,360 @@ function createDl(kids) {
 	return;
 }
 
+function startSlide(count) {
+	/* Displays the data.
+	   Cycles through each dt dd pair
+	   and marks it with css class name 
+	   'current'. Pairs marked 'current'
+	   are displayed, while others stay
+	   hidden, using css. */
+	
+	var cls, dt, dd, done, tempDt, tempDd, e, i, s, t;
+	
+	done = false;
+	tempDt = [];
+	tempDd = [];
+
+	dt = $("rateSlides").getElementsByTagName('dt');
+	dd = $("rateSlides").getElementsByTagName('dd');
+
+	for (e = 0; e < dt.length; e++) {
+		/* Opera recommends making changes to 
+		   a copy of the DOM */
+		tempDt[tempDt.length] = dt[e];
+	}
+	
+	for (i = 0; i < tempDt.length; i++) {
+		if (done) {
+			/* Once a dt element has been marked
+			   'current', no need to go through
+			   the rest of it as we display only
+			   one dt element at a time. */
+			
+			continue;
+		}
+		
+		cls = tempDt[i].className;
+		
+		if ((cls.indexOf("current")) !== -1) {
+			
+			/*  unmark the currently displayed dt */
+			tempDt[i].className = "";
+			
+			if (i === (tempDt.length - 1)) {
+				/* if we have reached the last 
+				   dt, mark the first dt again. */
+			
+				tempDt[0].className = 'current';
+			} else {
+				tempDt[i + 1].className = 'current';
+			}
+			
+			done = true;
+		}
+	}
+
+	tempDt = null;
+	done = false;
+
+	/* do the same thing for dd element
+	   as we did for the dt element in
+	   the code above. */
+	
+	for (s = 0; s < dd.length; s++) {
+		tempDd[tempDd.length] = dd[s];
+	}
+	
+	for (t = 0; t < tempDd.length; t++) {
+		if (done) { continue; }
+		
+		cls = tempDd[t].className;
+		
+		if ((cls.indexOf("current")) !== -1) {
+			
+			tempDd[t].className = "";
+
+			if (t === (tempDd.length - 1)) {
+				tempDd[0].className = 'current';
+			} else {
+				tempDd[t + 1].className = 'current';
+			}
+			
+			done = true;
+		}
+	}
+	
+	tempDd = null;
+}
+
+function refDial(cmd, out) {
+	/* Used to show the output
+	   in the speed dial. */
+	
+    var dt, dd, temp, o;
+    
+	if (cmd === "slides") {
+		/* Displays each data individually 
+		   in the speed dial as slides
+		   in a presentation. */
+		
+		clearInterval(slider);
+		
+		/* create the definition list
+		   structure used to show the data. */
+		createDl(out.length);
+		
+		dt = $("rateSlides").getElementsByTagName('dt');
+		dd = $("rateSlides").getElementsByTagName('dd');
+		
+		for (o = 0; o < out.length; o++) {
+			/*  add data */
+			
+			if (dt[o]) {
+				/*  reset css class */
+				dt[o].className = "";
+				/*  assign the new data */
+				dt[o].innerHTML = '<span class="etype">' + out[o][0] + '</span><br /><span class="' + out[o][1] + '">' +  out[o][2] + '<span>';
+			}
+			
+			if (dd[o]) {
+				/*  reset css class */
+				dd[o].className = "";
+				/*  assign the new data */
+				temp = '';
+				if (out[o][4]) { temp = ': ' + out[o][4]; }
+				dd[o].innerHTML = out[o][3] + temp;
+			}
+		}
+		
+		dt[0].className = 'current';
+		dd[0].className = 'current';
+		
+		hide("wait");
+		show("data");
+		
+		/* set display delay between pair*/
+		slider = setInterval(startSlide, parseInt((widget.preferences.showfor), 10) * 1000);
+		
+		/*  start displaying the data */
+		startSlide(out.length);
+		return;
+	}
+	
+	if (cmd === "showall") {
+		/* Displays all the data in 1 slide. */
+		
+		clearInterval(slider);
+		
+		/* create the definition list
+		   structure used to show the data. */
+		createDl(out.length);
+		
+		/* set style to display as table */
+		$("rateSlides").className = "table-display";
+		
+		dt = $("rateSlides").getElementsByTagName('dt');
+		dd = $("rateSlides").getElementsByTagName('dd');
+		
+		for (o = 0; o < out.length; o++) {
+			/*  add data */
+			
+			if (dt[o]) {
+				/*  reset css class */
+				dt[o].className = "current";
+				/*  assign the new data */
+				switch (out[o][0]) {
+                case 'today':
+                    temp = 'day: ';
+                    break;
+				case 'this month':
+                    temp = 'month: ';
+                    break;
+				case 'total':
+                    temp = 'total: ';
+                    break;
+				}
+				dt[o].innerHTML = '<span class="ttitle">' + temp + ' </span>';
+			}
+			
+			if (dd[o]) {
+				/*  reset css class */
+				dd[o].className = "current";
+				/*  assign the new data */
+				temp = '';
+				if (out[o][4]) { temp = ' vs ' + out[o][4]; }
+				dd[o].innerHTML = '<span class="' + out[o][1] + '">' +  out[o][2] + '</span>' + temp;
+			}
+		}
+		
+		hide("wait");
+		show("data");
+
+		return;
+	}
+
+	if (cmd === "login") {
+		/* tell the user to login */
+
+		$("msg").firstChild.nodeValue = "please login";
+
+		clearInterval(slider);
+		hide("data");
+		show("wait");
+		
+		return;
+	}
+	
+	if (cmd === "wait") {
+		/* used to indicate that an
+		   update of data is underway */
+
+		$("msg").firstChild.nodeValue = "updating";
+
+		clearInterval(slider);
+		hide("data");
+		show("wait");
+		
+		return;
+	}
+	
+	if (cmd === "hang") {
+		/* indicate some error
+		   has occured */
+
+		$("msg").firstChild.nodeValue = "Possible network error. Will retry again later.";
+		
+		clearInterval(slider);
+		hide("data");
+		show("wait");
+		
+		return;
+	}
+}
+
+function converter(file, arc, luc) {
+	/* Currency conversion */
+	
+    var csv, rates;
+	csv = file.split(/\r?\n/);
+	
+	if (arc === 'USD') {
+		rates = csv[0].split(',');
+		rate = parseFloat(rates[1]);
+	}
+	
+	if (arc === 'EUR') {
+		rates = csv[0].split(',');
+		rates = rates.concat(csv[1].split(','));
+		rate = parseFloat(rates[3]) / parseFloat(rates[1]);
+	}
+	
+	return;
+}
+
+function getReport() {
+	/* Scrape the mobile version of 
+	   Google Adsense Control Panel. */
+
+    var url, ext;
+	url = "https://www.google.com/adsense/m/";
+	
+	refDial('wait');
+	
+    ext = new XMLHttpRequest();
+	ext.open('GET', url, true);
+    
+	ext.onload = function (event) {
+        if (this.status === 200) {
+            data = this.responseText;
+            //scrapeAPI(data)
+            extract(data);
+        } else {
+            refDial("hang");
+        }
+	};
+
+	ext.send();
+}
+
+function getRates() {
+	/* Get currency rate from Yahoo! */
+	
+	var csvfile, query, url, arc, luc, ext;
+	
+    url = 'http://download.finance.yahoo.com/d/quotes.csv?f=sl1&e=.cs&s=';
+	
+	refDial('wait');
+	
+	arc = widget.preferences.arc;
+	luc = widget.preferences.luc;
+	
+	if (arc === 'USD') {
+		query = arc + luc + '=X';
+	}
+	
+	if (arc === 'EUR') {
+		query = 'USDEUR=X&s=USD' + luc + '=X';
+	}
+	
+	url = url + query;
+	
+	ext = new XMLHttpRequest();
+
+	ext.open('GET', url, true);
+	
+	ext.onreadystatechange = function (event) {
+		if (this.readyState === 4) {
+			if (this.status === 200 && this.responseText) {
+				csvfile = this.responseText;
+				converter(csvfile, arc, luc);
+			} else {
+				/* possible network error -
+				   tell the user. */
+				
+				refDial('hang');
+			}
+		}
+	};
+
+	ext.send();
+	return;
+}
+
+function scrape() {
+	/* get the data */
+	
+	var convert = parseInt(widget.preferences.convert, 10);
+	if (convert) {
+		getRates();
+	}
+	
+	getReport();
+}
+
 function extract(input) {
 	/* Checks if user has logged into Google
 	   Adsense control panel. If logged in,
 	   scrape the earnings data, else ask
 	   user to log in. */
 	   
-	var login;
-	var div;
-	var gcode;
-	var now, y, tm, lm, dComp, mComp, tue, te;
-	var eto, emo, etu;
-	var out = [];
+	var login, div, gcode, now, y, tm, lm, dComp, mComp, tue, te, eto, emo, etu, out, edaily, emonthly, etotal, slideshow, convert;
 	
-	var edaily = parseInt(widget.preferences.edaily, 10);
-	var emonthly = parseInt(widget.preferences.emonthly, 10);
-	var etotal = parseInt(widget.preferences.etotal, 10);
+    out = [];
 	
-	var slideshow = parseInt(widget.preferences.slideshow, 10);
-	var convert = parseInt(widget.preferences.convert, 10);
+	edaily = parseInt(widget.preferences.edaily, 10);
+	emonthly = parseInt(widget.preferences.emonthly, 10);
+	etotal = parseInt(widget.preferences.etotal, 10);
+	
+	slideshow = parseInt(widget.preferences.slideshow, 10);
+	convert = parseInt(widget.preferences.convert, 10);
 	
 	if (input) {
 	/*  parse the scraped page we got from Google */
 		
-		/* extract <body> element from scraped page */
-		gcode = input.substring(input.indexOf("<body>")+7, input.indexOf("</body>"));
-        opera.postError(gcode);
-        return;        
-		
+		/* extract <body> element kids from scraped page */
+		gcode = input.substring(input.indexOf("<body>") + 7, input.indexOf("</body>"));
+
 		/* We extract data based on the id's. 
 		   To do this efficiently, we use
 		   querySelector(), which works on DOM, 
@@ -185,13 +516,13 @@ function extract(input) {
 		   from the scraped page and search for
 		   known ids using querySelector(). */
 		   
-		div = E('div');
-		div.innerHTML = input;
+		div = e('div');
+		div.innerHTML = gcode;
 		
 		/* the login form has an id called 'gaia_loginform' */
 		login = div.querySelector("#gaia_loginform");
 		
-		if (login) {		
+		if (login) {
 			/* login form detected */
 			
 			/* inform user to login */
@@ -199,7 +530,7 @@ function extract(input) {
 			
 			/* reset refresh timer to check every 2 
 			   minute if user has logged in */
-			clearInterval(timeIt);   
+			clearInterval(timeIt);
 			timeIt = setInterval(scrape, parseInt(2, 10) * 60 * 1000);
 			
 		} else {
@@ -208,8 +539,8 @@ function extract(input) {
 			refDial('wait');
 			
 			/* reset refresh timer to default setting */
-			clearInterval(timeIt);   
-			timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);	
+			clearInterval(timeIt);
+			timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
 			
 			if (edaily) {
 				/* Daily earnings data */
@@ -264,7 +595,7 @@ function extract(input) {
 		
 
 				/* check if earning data is more or
-				   less than previous month's earning */			
+				   less than previous month's earning */
 				if ((parseFloat(tm.substr(1))) < (parseFloat(lm.substr(1)))) {
 					mComp = "down";
 				} else {
@@ -289,13 +620,13 @@ function extract(input) {
 					
 					tm = String(tm);
 					lm = String(lm);
-				}				
+                }
 
 				emo = ['this month', mComp, tm, 'last month', lm];
 				out.push(emo);
 			}
 			
-			if (etotal){
+			if (etotal) {
 				/* get total unpaid earnings - this
 				   is slightly tricky as there is no
 				   obvious id to search for this data */
@@ -316,7 +647,7 @@ function extract(input) {
 					te = trueRound(te);
 					
 					te = String(te);
-				}				
+				}
 				
 				etu = ['total', 'up', te, 'unpaid earnings'];
 				out.push(etu);
@@ -333,74 +664,10 @@ function extract(input) {
 	return;
 }
 
-function converter(file, arc, luc) {
-	/* Currency conversion */
-	
-	var csv = file.split(/\r?\n/);
-	var rates;
-	
-	if (arc === 'USD') {
-		rates = csv[0].split(',');
-		rate = parseFloat(rates[1]);
-	}
-	
-	if (arc === 'EUR') {
-		rates = csv[0].split(',');
-		rates = rates.concat(csv[1].split(','));
-		rate = parseFloat(rates[3]) / parseFloat(rates[1]);
-	}
-	
-	return;
-}
-
-function getRates() {
-	/* Get currency rate from Yahoo! */
-	
-	var csvfile;
-	var query;
-	var url = 'http://download.finance.yahoo.com/d/quotes.csv?f=sl1&e=.cs&s=';
-	
-	refDial('wait');
-	
-	var arc = widget.preferences.arc;
-	var luc = widget.preferences.luc;
-	
-	if (arc === 'USD') {
-		query = arc + luc + '=X';
-	} 
-	
-	if (arc === 'EUR') {
-		query = 'USDEUR=X&s=USD' + luc + '=X';
-	}
-	
-	url = url + query;
-	
-	var ext = new XMLHttpRequest();
-
-	ext.open('GET', url, true);
-	
-	ext.onreadystatechange = function (event) {
-		if (this.readyState == 4) {
-			if (this.status == 200 && this.responseText) {
-				csvfile = this.responseText;
-				converter(csvfile, arc, luc);
-			} else {
-				/* possible network error -
-				   tell the user. */
-				
-				refDial('hang');
-			}
-		}
-	};
-
-	ext.send();
-	return;
-}
-
 function scrapeAPI(input) {
     var lfedata, url, xhr, a, b, c, onLoad, data;
     
-    lfedata = input.substring(input.indexOf("ads.adsense.lightfe.main.init")+31, input.indexOf("ads.adsense.lightfe.home.loadData"));
+    lfedata = input.substring(input.indexOf("ads.adsense.lightfe.main.init") + 31, input.indexOf("ads.adsense.lightfe.home.loadData"));
     
     //opera.postError("1: " + lfedata);
     
@@ -408,8 +675,8 @@ function scrapeAPI(input) {
     
     lfedata[0] = lfedata[0].trim();
     lfedata[1] = lfedata[1].trim();
-    lfedata[0] = lfedata[0].substring(lfedata[0].indexOf("\'")+1, lfedata[0].lastIndexOf("\'"));
-    lfedata[1] = lfedata[1].substring(lfedata[1].indexOf("\'")+1, lfedata[1].lastIndexOf("\'"));
+    lfedata[0] = lfedata[0].substring(lfedata[0].indexOf("\'") + 1, lfedata[0].lastIndexOf("\'"));
+    lfedata[1] = lfedata[1].substring(lfedata[1].indexOf("\'") + 1, lfedata[1].lastIndexOf("\'"));
     
     opera.postError("2: " + lfedata[0]);
     opera.postError("3: " + lfedata[1]);
@@ -417,292 +684,41 @@ function scrapeAPI(input) {
     url = "https://www.google.com/adsense/m/data/home?hl=" + lfedata[0];
     xhr = new XMLHttpRequest();
     
-    onLoad = function(e) {
-        data = e.target.responseText;
-        data = data.substring(data.indexOf("{"), data.length);
-        opera.postError("JSON: " + data);
+    onLoad = function (e) {
+        if (e.target.status === 200) {
+            data = e.target.responseText;
+            data = data.substring(data.indexOf("{"), data.length);
+            opera.postError("JSON: " + data);
+        } else {
+            refDial("hang");
+        }
     };
     
     a = '';
-    c = ''+"="+b;
+    c = String('') + "=" + b;
+    
     xhr.open('POST', url, true);
+    xhr.onload = onLoad;
     xhr.timeout = 10000;
     xhr.withCredentials = true;
+    
     xhr.setRequestHeader("Referer", "https://www.google.com/adsense/m/");
-    xhr.setRequestHeader("Content-Length", "0");    
+    xhr.setRequestHeader("Content-Length", "0");
     xhr.setRequestHeader("X-Lightfe-Auth", "1");
     xhr.setRequestHeader("Client-Version", lfedata[1]);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
     
     xhr.send(c);
-    
-    xhr.onload = onLoad;
 }
 
-function getReport() {
-	/* Scrape the mobile version of 
-	   Google Adsense Control Panel. */
-//
-	var url = "https://www.google.com/adsense/m/";
-	
-	refDial('wait');
-	
-    var ext = new XMLHttpRequest();
-	ext.open('GET', url, true);
-    
-	ext.onload = function (event) {
-        if (this.status == 200) {
-            data = this.responseText;
-            //opera.postError("Scrape: " + data);
-            scrapeAPI(data);
-		  //extract(data);
-        }
-	};
-
-	ext.send();
+function setRefreshTimer() {
+	clearInterval(timeIt);
+	timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
 }
 
-function scrape() {
-	/* get the data */
-	
-	var convert = parseInt(widget.preferences.convert, 10);
-	if (convert) {
-		getRates();
-	}
-	
-	getReport();
-}
-
-function refDial(cmd, out) {
-	/* Used to show the output
-	   in the speed dial. */
-	
-	if (cmd == "slides") {
-		/* Displays each data individually 
-		   in the speed dial as slides
-		   in a presentation. */
-		
-		var dt, dd, temp;
-		
-		clearInterval(slider);	
-		
-		/* create the definition list
-		   structure used to show the data. */
-		createDl(out.length);
-		
-		dt = $("rateSlides").getElementsByTagName('dt');
-		dd = $("rateSlides").getElementsByTagName('dd');
-		
-		for (var o = 0; o < out.length; o++) {
-			/*  add data */
-			
-			if (dt[o]) {
-				/*  reset css class */
-				dt[o].className = "";
-				/*  assign the new data */
-				dt[o].innerHTML = '<span class="etype">' + out[o][0] + '</span><br /><span class="' + out[o][1] + '">' +  out[o][2] + '<span>';
-			} 
-			
-			if (dd[o]) {
-				/*  reset css class */
-				dd[o].className = "";	
-				/*  assign the new data */
-				temp = '';
-				if (out[o][4]) { temp = ': ' + out[o][4]; }
-				dd[o].innerHTML = out[o][3] + temp;
-			}			
-		}
-		
-		dt[0].className = 'current';
-		dd[0].className = 'current';
-		
-		hide("wait");
-		show("data");
-		
-		/* set display delay between pair*/
-		slider = setInterval(startSlide, parseInt((widget.preferences.showfor), 10) * 1000);
-		
-		/*  start displaying the data */
-		startSlide(out.length);
-		return;
-	}
-	
-	if (cmd == "showall") {
-		/* Displays all the data in 1 slide. */
-		
-		var dt, dd, temp;
-		
-		clearInterval(slider);	
-		
-		/* create the definition list
-		   structure used to show the data. */
-		createDl(out.length);
-		
-		/* set style to display as table */
-		$("rateSlides").className = "table-display";
-		
-		dt = $("rateSlides").getElementsByTagName('dt');
-		dd = $("rateSlides").getElementsByTagName('dd');
-		
-		for (var o = 0; o < out.length; o++) {
-			/*  add data */
-			
-			if (dt[o]) {
-				/*  reset css class */
-				dt[o].className = "current";
-				/*  assign the new data */
-				switch(out[o][0]) {
-					case 'today': temp = 'day: '; break;
-					case 'this month': temp = 'month: '; break;
-					case 'total': temp = 'total: '; break;
-				}
-				dt[o].innerHTML = '<span class="ttitle">' + temp + ' </span>';
-			} 
-			
-			if (dd[o]) {
-				/*  reset css class */
-				dd[o].className = "current";	
-				/*  assign the new data */				
-				temp = '';
-				if (out[o][4]) { temp = ' vs ' + out[o][4]; }
-				dd[o].innerHTML = '<span class="' + out[o][1] + '">' +  out[o][2] + '</span>' + temp;
-			}			
-		}
-		
-		hide("wait");
-		show("data");
-
-		return;
-	}	
-
-	if (cmd == "login") {
-		/* tell the user to login */
-
-		$("msg").firstChild.nodeValue = "please login";
-
-		clearInterval(slider);			
-		hide("data");
-		show("wait");
-		
-		return;
-	}
-	
-	if (cmd == "wait") {
-		/* used to indicate that an
-		   update of data is underway */
-
-		$("msg").firstChild.nodeValue = "updating";
-
-		clearInterval(slider);			
-		hide("data");
-		show("wait");
-		
-		return;
-	}
-	
-	if (cmd == "hang") {
-		/* indicate some error
-		   has occured */
-
-		$("msg").firstChild.nodeValue = "Possible network error. Will retry again later.";
-		
-		clearInterval(slider);	
-		hide("data");
-		show("wait");		
-		
-		return;
-	} 
-}
-
-function startSlide(count) {
-	/* Displays the data.
-	   Cycles through each dt dd pair
-	   and marks it with css class name 
-	   'current'. Pairs marked 'current'
-	   are displayed, while others stay
-	   hidden, using css. */
-	
-	var cls;
-	var dt;
-	var dd;
-	var done;
-	var tempDt;
-	var tempDd;
-	
-	done = false;
-	tempDt = [];
-	tempDd = [];
-
-	dt = $("rateSlides").getElementsByTagName('dt');
-	dd = $("rateSlides").getElementsByTagName('dd');
-
-	for (var e=0; e < dt.length; e++) {
-		/* Opera recommends making changes to 
-		   a copy of the DOM */
-		tempDt[tempDt.length] = dt[e];
-	}
-	
-	for (var i = 0; i < tempDt.length; i++) {
-		if (done) { 
-			/* Once a dt element has been marked
-			   'current', no need to go through
-			   the rest of it as we display only
-			   one dt element at a time. */
-			
-			continue; 
-		}
-		
-		cls = tempDt[i].className;
-		
-		if ((cls.indexOf("current")) != -1) {
-			
-			/*  unmark the currently displayed dt */
-			tempDt[i].className = "";
-			
-			if (i == (tempDt.length-1)) {
-				/* if we have reached the last 
-				   dt, mark the first dt again. */
-			
-				tempDt[0].className = 'current';
-			} else {
-				tempDt[i+1].className = 'current';
-			}
-			
-			done = true;
-		}
-	}
-
-	tempDt = null;
-	done = false;
-
-	/* do the same thing for dd element
-	   as we did for the dt element in
-	   the code above. */
-	
-	for (var s=0; s < dd.length; s++) {
-		tempDd[tempDd.length] = dd[s];
-	}
-	
-	for (var t = 0; t < tempDd.length; t++) {
-		if (done) { continue; }
-		
-		cls = tempDd[t].className;
-		
-		if ((cls.indexOf("current")) != -1) {
-			
-			tempDd[t].className = "";
-
-			if (t === (tempDd.length-1)) {
-				tempDd[0].className = 'current';
-			} else {
-				tempDd[t+1].className = 'current';
-			}
-			
-			done = true;
-		}
-	}
-	
-	tempDd = null;
+function setDisplayTimer() {
+	clearInterval(slider);
+	slider = setInterval(startSlide, parseInt((widget.preferences.showfor), 10) * 1000);
 }
 
 function reconfigure(e) {
@@ -714,25 +730,27 @@ function reconfigure(e) {
 	   with the new options set by the user. */
 	
 	var gac = data;
-	if (e.storageArea != widget.preferences) return;
-	switch(e.key) {
-		case 'interval': setRefreshTimer(); break;
-		case 'showfor': setDisplayTimer(); break;
-		case 'edaily': extract(gac); break;
-		case 'emonthly': extract(gac); break;
-		case 'etotal': extract(gac); break;
-		case 'slideshow': extract(gac); break;
+	if (e.storageArea !== widget.preferences) { return; }
+	switch (e.key) {
+    case 'interval':
+        setRefreshTimer();
+        break;
+    case 'showfor':
+        setDisplayTimer();
+        break;
+	case 'edaily':
+        extract(gac);
+        break;
+	case 'emonthly':
+        extract(gac);
+        break;
+	case 'etotal':
+        extract(gac);
+        break;
+	case 'slideshow':
+        extract(gac);
+        break;
 	}
-}
-
-function setRefreshTimer() {
-	clearInterval(timeIt); 
-	timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
-}
-
-function setDisplayTimer() {
-	clearInterval(slider);
-	slider = setInterval(startSlide, parseInt((widget.preferences.showfor), 10) * 1000);
 }
 
 function init() {
@@ -741,7 +759,7 @@ function init() {
 
 	/* monitors if options are updated and 
 	   saved in widget preferences. */
-	window.addEventListener('storage', reconfigure, false);	   
+	window.addEventListener('storage', reconfigure, false);
 	
 	/* The 'interval' key in the preferences 
 	   specifies the delay between updates.
