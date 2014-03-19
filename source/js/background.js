@@ -29,6 +29,7 @@
 var timeIt = null; // data refresh timer
 var slider; // slide time delay
 var data; // raw adsense data
+var etable; // earnings table page
 var out; // output data
 var rate; // parsed currency rates
 
@@ -390,7 +391,7 @@ function extract() {
 	/* Extract and format the raw 
         data for our use. */
 	   
-	var earnings, now, y, tm, lm, dComp, mComp, tue, te, eto, emo, etu, edaily, emonthly, etotal, slideshow, convert, temp;
+	var earnings, now, y, tm, lm, dComp, mComp, tue, te, eto, emo, etu, edaily, emonthly, etotal, slideshow, convert, temp, div;
 	
     out = [];
 	
@@ -505,34 +506,33 @@ function extract() {
 			out.push(emo);
 		}
         
-        /*
-			if (etotal) {
-				 get total unpaid earnings - this
-				   is slightly tricky as there is no
-				   obvious id to search for this data 
-				
-				tue = div.querySelectorAll('ul.metrics-list li:first-of-type span.value');
-				te = tue[1].firstChild.nodeValue;
-				
-				if (convert) {
-					te = te.trim();
-					
-					// remove dollar / euro symbol
-					te = te.slice(1);
-					
-					// convert to local currency
-					te = parseFloat(te) * rate;
-					
-					// roundoff to 2 decimals
-					te = trueRound(te);
-					
-					te = String(te);
-				}
-				
-				etu = ['total', 'up', te, 'unpaid earnings'];
-				out.push(etu);
-			}
-        */
+        if (etotal) {
+		/* get total unpaid earnings */
+            
+            div = e('div');
+            div.innerHTML = etable;
+            
+            tue = div.querySelector("div#content table.paymentreport tbody tr.columntitle:last-child td:last-child");
+            te = tue.textContent;
+            
+            if (convert) {
+                te = te.trim();
+                
+                // remove dollar / euro symbol
+                te = te.slice(1);
+                
+                // convert to local currency
+                te = parseFloat(te) * rate;
+                
+                // roundoff to 2 decimals
+                te = trueRound(te);
+                
+                te = String(te);
+            }
+            
+            etu = ['total', 'up', te, 'unpaid earnings'];
+            out.push(etu);
+        }
 			
         if (slideshow) {
             refDial('slides', out);
@@ -562,6 +562,47 @@ function converter(file, arc, luc) {
 	}
 	
 	return;
+}
+
+function authenticated(input) {
+/*  checks if user is logged in
+    and returns True or False */
+    
+    var stat, gcode, div, login;
+    
+    stat = false;
+    
+	if (input) {
+	/*  parse the scraped page we got from Google */
+		
+		/* extract <body> element kids from scraped page */
+		gcode = input.substring(input.indexOf("<body>") + 7, input.indexOf("</body>"));
+
+		/* We extract data based on the id's. 
+		   To do this efficiently, we use
+		   querySelector(), which works on DOM, 
+		   elements and document fragments. So we
+		   create an element, append the elements 
+		   from the scraped page and search for
+		   known ids using querySelector(). */
+		   
+		div = e('div');
+        
+        /* Note: innerHTML doesn't execute any 
+           JS code. */
+		div.innerHTML = gcode;
+		
+		/* the login form has an id called 'gaia_loginform' */
+		login = div.querySelector("#gaia_loginform");
+        
+        if (login) {
+            /* login form found */
+            stat = false;
+        } else {
+            stat = true;
+        }
+    }
+    return stat;
 }
 
 function getRates() {
@@ -608,47 +649,31 @@ function getRates() {
 	return;
 }
 
-function authenticated(input) {
-/*  checks if user is logged in
-    and returns True or False */
-    
-    var stat, gcode, div, login;
-    
-    stat = false;
-    
-	if (input) {
-	/*  parse the scraped page we got from Google */
-		
-		/* extract <body> element kids from scraped page */
-		gcode = input.substring(input.indexOf("<body>") + 7, input.indexOf("</body>"));
+function getTotal() {
+/* To get total unpaid
+    finalised earnings. */
 
-		/* We extract data based on the id's. 
-		   To do this efficiently, we use
-		   querySelector(), which works on DOM, 
-		   elements and document fragments. So we
-		   create an element, append the elements 
-		   from the scraped page and search for
-		   known ids using querySelector(). */
-		   
-		div = e('div');
-        
-        /* Note: innerHTML doesn't execute any 
-           JS code. */
-		div.innerHTML = gcode;
-		
-		/* the login form has an id called 'gaia_loginform' */
-		login = div.querySelector("#gaia_loginform");
-        
-        if (login) {
-            /* login form found */
-            stat = false;
+    var url, xhr, p;
+	url = "https://www.google.com/adsense/reports-payment";
+	
+	refDial('wait');
+	
+    xhr = new XMLHttpRequest();
+	xhr.open('POST', url, true);
+    p = "reportRange=ALL_TIME";
+	xhr.onload = function (event) {
+        if (this.status === 200) {
+            etable = this.responseText;
+            extract();
         } else {
-            stat = true;
+            refDial("hang");
         }
-    }
-    return stat;
+	};
+    
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhr.send(p);
 }
-
+ 
 function getRaw(input) {
 /* Calls an interface that returns
    an invalid JSON that has the daily
@@ -681,8 +706,10 @@ function getRaw(input) {
             data = data.substring(data.indexOf("{"), data.length);
             data = JSON.parse(data);
             
-            extract();
+            getTotal();
         } else {
+            /* possible network error -
+               tell the user. */            
             refDial("hang");
         }
     };
@@ -705,8 +732,8 @@ function getRaw(input) {
 }
 
 function getPage() {
-	/* Scrape the mobile version of 
-	   Google Adsense Control Panel. */
+/* Scrape the mobile version of 
+    Google Adsense Control Panel. */
 
     var url, ext;
 	url = "https://www.google.com/adsense/m/";
@@ -718,7 +745,6 @@ function getPage() {
     
 	ext.onload = function (event) {
         var page;
-        
         if (this.status === 200) {
             page = this.responseText;
             if (authenticated(page)) {
@@ -733,6 +759,8 @@ function getPage() {
                 timeIt = setInterval(scrape, 60000);
             }
         } else {
+            /* possible network error -
+				tell the user. */
             refDial("hang");
         }
 	};
