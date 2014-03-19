@@ -28,7 +28,8 @@
 
 var timeIt = null; // data refresh timer
 var slider; // slide time delay
-var data; // scraped adsense page
+var data; // raw adsense data
+var out; // output data
 var rate; // parsed currency rates
 
 function $(v) {
@@ -98,13 +99,13 @@ function createDl(kids) {
 			for (a = 0; a < z; a++) {
 				dt = e('dt');
 				tx = txt('');
-				dt.appendChild(txt);
+				dt.appendChild(tx);
 				
 				inHtml.appendChild(dt);
 				
 				dd = e('dd');
 				tx = txt('');
-				dd.appendChild(txt);
+				dd.appendChild(tx);
 				
 				inHtml.appendChild(dd);
 			}
@@ -137,13 +138,13 @@ function createDl(kids) {
 	for (i = 0; i < kids; i++) {
 		dt = e('dt');
 		tx = txt('');
-		dt.appendChild(txt);
+		dt.appendChild(tx);
 		
 		dl.appendChild(dt);
 		
 		dd = e('dd');
 		tx = txt('');
-		dd.appendChild(txt);
+		dd.appendChild(tx);
 		
 		dl.appendChild(dd);
 	}
@@ -385,6 +386,164 @@ function refDial(cmd, out) {
 	}
 }
 
+function extract() {
+	/* Extract and format the raw 
+        data for our use. */
+	   
+	var earnings, now, y, tm, lm, dComp, mComp, tue, te, eto, emo, etu, edaily, emonthly, etotal, slideshow, convert, temp;
+	
+    out = [];
+	
+	edaily = parseInt(widget.preferences.edaily, 10);
+	emonthly = parseInt(widget.preferences.emonthly, 10);
+	etotal = parseInt(widget.preferences.etotal, 10);
+	
+	slideshow = parseInt(widget.preferences.slideshow, 10);
+	convert = parseInt(widget.preferences.convert, 10);
+    
+    earnings = data.earnings;
+	
+	if (earnings) {
+		refDial('wait');
+			
+		/* reset refresh timer to default setting */
+		clearInterval(timeIt);
+		timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
+			
+		if (edaily) {
+            /* Daily earnings data */
+            
+            temp = earnings.filter(function (item) {
+                if (item.indexOf("Today so far") !== -1) { return true; }
+            });
+            
+            now = temp[0][2];
+            
+            temp = earnings.filter(function (item) {
+                if (item.indexOf("Yesterday") !== -1) { return true; }
+            });
+            
+			y = temp[0][2];
+
+			/* check if earning data is more or
+			   less than previous day's earning */
+			if ((parseFloat(now.substr(1))) <= (parseFloat(y.substr(1)))) {
+				dComp = "down";
+			} else {
+				dComp = "up";
+			}
+				
+			if (convert) {
+				now = now.trim();
+				y = y.trim();
+				
+				// remove dollar / euro symbol
+				now = now.slice(1);
+				y = y.slice(1);
+					
+				// convert to local currency
+				now = parseFloat(now) * rate;
+				y = parseFloat(y) * rate;
+				
+				// roundoff to 2 decimals
+				now = trueRound(now);
+				y = trueRound(y);
+					
+				now = String(now);
+				y = String(y);
+			}
+				
+			eto = ['today', dComp, now, 'yesterday', y];
+			out.push(eto);
+        }
+			
+		if (emonthly) {
+            /* Monthly earnings data */
+            
+            temp = earnings.filter(function (item) {
+                if (item.indexOf("This month so far") !== -1) { return true; }
+            });
+            
+			tm = temp[0][2];
+        
+            temp = earnings.filter(function (item) {
+                if (item.indexOf("Last month") !== -1) { return true; }
+            });
+            
+			lm = temp[0][2];
+		  
+            /* check if earning data is more or
+			   less than previous month's earning */
+			
+            if ((parseFloat(tm.substr(1))) <= (parseFloat(lm.substr(1)))) {
+				mComp = "down";
+			} else {
+				mComp = "up";
+			}
+			
+			if (convert) {
+				tm = tm.trim();
+				lm = lm.trim();
+				
+				// remove dollar / euro symbol
+				tm = tm.slice(1);
+				lm = lm.slice(1);
+				
+				// convert to local currency
+				tm = parseFloat(tm) * rate;
+				lm = parseFloat(lm) * rate;
+				
+				// roundoff to 2 decimals
+				tm = trueRound(tm);
+				lm = trueRound(lm);
+				
+				tm = String(tm);
+				lm = String(lm);
+            }
+
+			emo = ['this month', mComp, tm, 'last month', lm];
+			out.push(emo);
+		}
+        
+        /*
+			if (etotal) {
+				 get total unpaid earnings - this
+				   is slightly tricky as there is no
+				   obvious id to search for this data 
+				
+				tue = div.querySelectorAll('ul.metrics-list li:first-of-type span.value');
+				te = tue[1].firstChild.nodeValue;
+				
+				if (convert) {
+					te = te.trim();
+					
+					// remove dollar / euro symbol
+					te = te.slice(1);
+					
+					// convert to local currency
+					te = parseFloat(te) * rate;
+					
+					// roundoff to 2 decimals
+					te = trueRound(te);
+					
+					te = String(te);
+				}
+				
+				etu = ['total', 'up', te, 'unpaid earnings'];
+				out.push(etu);
+			}
+        */
+			
+        if (slideshow) {
+            refDial('slides', out);
+		} else {
+            refDial('showall', out);
+		}
+    }
+	
+	return;
+}
+
 function converter(file, arc, luc) {
 	/* Currency conversion */
 	
@@ -403,31 +562,6 @@ function converter(file, arc, luc) {
 	}
 	
 	return;
-}
-
-function getReport() {
-	/* Scrape the mobile version of 
-	   Google Adsense Control Panel. */
-
-    var url, ext;
-	url = "https://www.google.com/adsense/m/";
-	
-	refDial('wait');
-	
-    ext = new XMLHttpRequest();
-	ext.open('GET', url, true);
-    
-	ext.onload = function (event) {
-        if (this.status === 200) {
-            data = this.responseText;
-            //scrapeAPI(data)
-            extract(data);
-        } else {
-            refDial("hang");
-        }
-	};
-
-	ext.send();
 }
 
 function getRates() {
@@ -474,34 +608,14 @@ function getRates() {
 	return;
 }
 
-function scrape() {
-	/* get the data */
-	
-	var convert = parseInt(widget.preferences.convert, 10);
-	if (convert) {
-		getRates();
-	}
-	
-	getReport();
-}
-
-function extract(input) {
-	/* Checks if user has logged into Google
-	   Adsense control panel. If logged in,
-	   scrape the earnings data, else ask
-	   user to log in. */
-	   
-	var login, div, gcode, now, y, tm, lm, dComp, mComp, tue, te, eto, emo, etu, out, edaily, emonthly, etotal, slideshow, convert;
-	
-    out = [];
-	
-	edaily = parseInt(widget.preferences.edaily, 10);
-	emonthly = parseInt(widget.preferences.emonthly, 10);
-	etotal = parseInt(widget.preferences.etotal, 10);
-	
-	slideshow = parseInt(widget.preferences.slideshow, 10);
-	convert = parseInt(widget.preferences.convert, 10);
-	
+function authenticated(input) {
+/*  checks if user is logged in
+    and returns True or False */
+    
+    var stat, gcode, div, login;
+    
+    stat = false;
+    
 	if (input) {
 	/*  parse the scraped page we got from Google */
 		
@@ -517,160 +631,34 @@ function extract(input) {
 		   known ids using querySelector(). */
 		   
 		div = e('div');
+        
+        /* Note: innerHTML doesn't execute any 
+           JS code. */
 		div.innerHTML = gcode;
 		
 		/* the login form has an id called 'gaia_loginform' */
 		login = div.querySelector("#gaia_loginform");
-		
-		if (login) {
-			/* login form detected */
-			
-			/* inform user to login */
-			refDial('login');
-			
-			/* reset refresh timer to check every 2 
-			   minute if user has logged in */
-			clearInterval(timeIt);
-			timeIt = setInterval(scrape, parseInt(2, 10) * 60 * 1000);
-			
-		} else {
-			/* user is logged in */
-			
-			refDial('wait');
-			
-			/* reset refresh timer to default setting */
-			clearInterval(timeIt);
-			timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
-			
-			if (edaily) {
-				/* Daily earnings data */
-				
-				/* extract the earning data using the 
-				   obvious ids */
-				   
-				now = div.querySelector("#earnings-today").firstChild.nodeValue;
-				y = div.querySelector("#earnings-yesterday").firstChild.nodeValue;
-
-				/* check if earning data is more or
-				   less than previous day's earning */
-				if ((parseFloat(now.substr(1))) < (parseFloat(y.substr(1)))) {
-					dComp = "down";
-				} else {
-					dComp = "up";
-				}
-				
-				if (convert) {
-					now = now.trim();
-					y = y.trim();
-					
-					// remove dollar / euro symbol
-					now = now.slice(1);
-					y = y.slice(1);
-					
-					// convert to local currency
-					now = parseFloat(now) * rate;
-					y = parseFloat(y) * rate;
-					
-					// roundoff to 2 decimals
-					now = trueRound(now);
-					y = trueRound(y);
-					
-					now = String(now);
-					y = String(y);
-				}
-				
-				eto = ['today', dComp, now, 'yesterday', y];
-				out.push(eto);
-			}
-			
-			if (emonthly) {
-				/* Daily earnings data */
-				
-				/* extract the earning data using the 
-				   obvious id's */
-				   
-				
-				tm = div.querySelector("#earnings-this-month").firstChild.nodeValue;
-				lm = div.querySelector("#earnings-last-month").firstChild.nodeValue;
-		
-
-				/* check if earning data is more or
-				   less than previous month's earning */
-				if ((parseFloat(tm.substr(1))) < (parseFloat(lm.substr(1)))) {
-					mComp = "down";
-				} else {
-					mComp = "up";
-				}
-				
-				if (convert) {
-					tm = tm.trim();
-					lm = lm.trim();
-					
-					// remove dollar / euro symbol
-					tm = tm.slice(1);
-					lm = lm.slice(1);
-					
-					// convert to local currency
-					tm = parseFloat(tm) * rate;
-					lm = parseFloat(lm) * rate;
-					
-					// roundoff to 2 decimals
-					tm = trueRound(tm);
-					lm = trueRound(lm);
-					
-					tm = String(tm);
-					lm = String(lm);
-                }
-
-				emo = ['this month', mComp, tm, 'last month', lm];
-				out.push(emo);
-			}
-			
-			if (etotal) {
-				/* get total unpaid earnings - this
-				   is slightly tricky as there is no
-				   obvious id to search for this data */
-				
-				tue = div.querySelectorAll('ul.metrics-list li:first-of-type span.value');
-				te = tue[1].firstChild.nodeValue;
-				
-				if (convert) {
-					te = te.trim();
-					
-					// remove dollar / euro symbol
-					te = te.slice(1);
-					
-					// convert to local currency
-					te = parseFloat(te) * rate;
-					
-					// roundoff to 2 decimals
-					te = trueRound(te);
-					
-					te = String(te);
-				}
-				
-				etu = ['total', 'up', te, 'unpaid earnings'];
-				out.push(etu);
-			}
-			
-			if (slideshow) {
-				refDial('slides', out);
-			} else {
-				refDial('showall', out);
-			}
-		}
-	}
-	
-	return;
+        
+        if (login) {
+            /* login form found */
+            stat = false;
+        } else {
+            stat = true;
+        }
+    }
+    return stat;
 }
 
-function scrapeAPI(input) {
-    var lfedata, url, xhr, a, b, c, onLoad, data;
+function getRaw(input) {
+/* Calls an interface that returns
+   an invalid JSON that has the daily
+   and monthly earnings data we seek. */
     
-    lfedata = input.substring(input.indexOf("ads.adsense.lightfe.main.init") + 31, input.indexOf("ads.adsense.lightfe.home.loadData"));
+    var lfedata, url, xhr, a, b, c, onLoad;
     
-    //opera.postError("1: " + lfedata);
-    
+    lfedata = input.substring(input.indexOf("ads.adsense.lightfe.main.init") + 31, input.indexOf("ads.adsense.lightfe.home.loadData")); 
+        
+    /* TODO: error check lfedata  */
     lfedata = lfedata.split(",");
     
     lfedata[0] = lfedata[0].trim();
@@ -678,24 +666,29 @@ function scrapeAPI(input) {
     lfedata[0] = lfedata[0].substring(lfedata[0].indexOf("\'") + 1, lfedata[0].lastIndexOf("\'"));
     lfedata[1] = lfedata[1].substring(lfedata[1].indexOf("\'") + 1, lfedata[1].lastIndexOf("\'"));
     
-    opera.postError("2: " + lfedata[0]);
-    opera.postError("3: " + lfedata[1]);
-    
     url = "https://www.google.com/adsense/m/data/home?hl=" + lfedata[0];
     xhr = new XMLHttpRequest();
     
     onLoad = function (e) {
         if (e.target.status === 200) {
             data = e.target.responseText;
+            
+            /* sample raw data - 
+            )]}'{"top_channels": [["channel-name", "$0.42"], ["channel-name", "$0.14"], ["channel-name", "$0.12"], ["channel-name", "$0.04"]], "accounts": [{"kind": "adsense#account", "premium": false, "id": "pub-01234567890123456", "name": "pub-01234567890123456"}], "earnings": [["Today so far", "-", "$0.25"], ["Yesterday", "Mon March 17, 2014", "$5.14"], ["This month so far", "March", "$30.64"], ["Last month", "February", "$28.59"]]} 
+            */
+            
+            // get valid JSON data from raw data
             data = data.substring(data.indexOf("{"), data.length);
-            opera.postError("JSON: " + data);
+            data = JSON.parse(data);
+            
+            extract();
         } else {
             refDial("hang");
         }
     };
     
     a = '';
-    c = String('') + "=" + b;
+    c = a + "=" + b;
     
     xhr.open('POST', url, true);
     xhr.onload = onLoad;
@@ -711,6 +704,53 @@ function scrapeAPI(input) {
     xhr.send(c);
 }
 
+function getPage() {
+	/* Scrape the mobile version of 
+	   Google Adsense Control Panel. */
+
+    var url, ext;
+	url = "https://www.google.com/adsense/m/";
+	
+	refDial('wait');
+	
+    ext = new XMLHttpRequest();
+	ext.open('GET', url, true);
+    
+	ext.onload = function (event) {
+        var page;
+        
+        if (this.status === 200) {
+            page = this.responseText;
+            if (authenticated(page)) {
+                getRaw(page);
+            } else {
+                /* inform user to login */
+                refDial('login');
+                
+                /* reset refresh timer to check every  
+                   minute if user has logged in */
+                clearInterval(timeIt);
+                timeIt = setInterval(scrape, 60000);
+            }
+        } else {
+            refDial("hang");
+        }
+	};
+
+	ext.send();
+}
+
+function scrape() {
+	/* get the data */
+	
+	var convert = parseInt(widget.preferences.convert, 10);
+	if (convert) {
+		getRates();
+	}
+	
+	getPage();
+}
+
 function setRefreshTimer() {
 	clearInterval(timeIt);
 	timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
@@ -722,14 +762,9 @@ function setDisplayTimer() {
 }
 
 function reconfigure(e) {
-	/* This code didn't work as expected.
-	   Needs more testing to figure out if
-	   it was some opera bug. It's here as 
-	   as a stub for future versions.
-	   It is meant to update the speed dial
-	   with the new options set by the user. */
+/* Update the speed dial to reflect the
+    changes made in options by the user. */
 	
-	var gac = data;
 	if (e.storageArea !== widget.preferences) { return; }
 	switch (e.key) {
     case 'interval':
@@ -739,16 +774,16 @@ function reconfigure(e) {
         setDisplayTimer();
         break;
 	case 'edaily':
-        extract(gac);
+        extract();
         break;
 	case 'emonthly':
-        extract(gac);
+        extract();
         break;
 	case 'etotal':
-        extract(gac);
+        extract();
         break;
 	case 'slideshow':
-        extract(gac);
+        extract();
         break;
 	}
 }
