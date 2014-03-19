@@ -100,7 +100,7 @@ function apply() {
 		document.input.interval.value = i;
 	}
 	
-	if (i < 15) {
+	if (i < 30) {
 		/* Validation - interval cannot be less than 15 */
 		status("Error: Update interval should be more than 15 minutes.");
 		return;
