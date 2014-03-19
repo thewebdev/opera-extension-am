@@ -656,7 +656,7 @@ function getRaw(input) {
     
     var lfedata, url, xhr, a, b, c, onLoad;
     
-    lfedata = input.substring(input.indexOf("ads.adsense.lightfe.main.init") + 31, input.indexOf("ads.adsense.lightfe.home.loadData")); 
+    lfedata = input.substring(input.indexOf("ads.adsense.lightfe.main.init") + 31, input.indexOf("ads.adsense.lightfe.home.loadData"));
         
     /* TODO: error check lfedata  */
     lfedata = lfedata.split(",");
