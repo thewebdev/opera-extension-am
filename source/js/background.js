@@ -30,6 +30,7 @@ var timeIt = null; // data refresh timer
 var slider; // slide time delay
 var data; // raw adsense data
 var etable; // earnings table page
+var totality = false; // flag for total earning
 var out; // output data
 var rate; // parsed currency rates
 
@@ -654,6 +655,17 @@ function getTotal() {
     finalised earnings. */
 
     var url, xhr, p;
+    
+    /*  Total unpaid earnings is updated
+        only monthly. So once we get it, 
+        no need to constantly check 
+        again for updates. */
+    
+    if (totality) {
+        extract();
+        return;
+    }
+    
 	url = "https://www.google.com/adsense/reports-payment";
 	
 	refDial('wait');
@@ -664,8 +676,11 @@ function getTotal() {
 	xhr.onload = function (event) {
         if (this.status === 200) {
             etable = this.responseText;
+            totality = true;            
             extract();
         } else {
+            /* possible network error -
+               tell the user. */
             refDial("hang");
         }
 	};
@@ -709,7 +724,7 @@ function getRaw(input) {
             getTotal();
         } else {
             /* possible network error -
-               tell the user. */            
+               tell the user. */
             refDial("hang");
         }
     };
