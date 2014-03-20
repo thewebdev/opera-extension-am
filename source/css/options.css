@@ -45,8 +45,6 @@ h2 {
 	font-size:1.2em;
 }
 a:link, a:visited, a:active {
-	margin-right: 4px;
-	padding: 0px 3px;
 	color: #0644D4;
 	text-decoration:none;
 	font-weight: bold;
@@ -54,6 +52,9 @@ a:link, a:visited, a:active {
 }
 #options {
 	width: 450px;
+}
+#support {
+    background-color: #fffcd3;
 }
 #msg {
 	display: none;

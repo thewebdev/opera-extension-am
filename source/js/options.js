@@ -181,9 +181,11 @@ function nocurrency() {
 	if (check) {
 		document.input.first.disabled = false;
 		document.input.second.disabled = false;
+        show("currency");
 	} else {
 		document.input.first.disabled = true;
 		document.input.second.disabled = true;
+        hide("currency");
 	}
 }
 
