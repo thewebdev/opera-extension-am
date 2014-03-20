@@ -30,9 +30,10 @@ var timeIt = null; // data refresh timer
 var slider; // slide time delay
 var data; // raw adsense data
 var etable; // earnings table page
-var totality = false; // flag for total earning
 var out; // output data
 var rate; // parsed currency rates
+var totality = false; // flag for total earning
+var allowed = false; // flag for login check
 
 function $(v) {
 	/* DOM: identifies element */
@@ -389,8 +390,8 @@ function refDial(cmd, out) {
 }
 
 function extract() {
-	/* Extract and format the raw 
-        data for our use. */
+/*  Extract and format the raw 
+    data for our use. */
 	   
 	var earnings, now, y, tm, lm, dComp, mComp, tue, te, eto, emo, etu, edaily, emonthly, etotal, slideshow, convert, temp, div;
 	
@@ -565,7 +566,7 @@ function converter(file, arc, luc) {
 	return;
 }
 
-function authenticated(input) {
+function authenticate(input) {
 /*  checks if user is logged in
     and returns True or False */
     
@@ -598,9 +599,9 @@ function authenticated(input) {
         
         if (login) {
             /* login form found */
-            stat = false;
+            allowed = false;
         } else {
-            stat = true;
+            allowed = true;
         }
     }
     return stat;
@@ -676,7 +677,7 @@ function getTotal() {
 	xhr.onload = function (event) {
         if (this.status === 200) {
             etable = this.responseText;
-            totality = true;            
+            totality = true;
             extract();
         } else {
             /* possible network error -
@@ -762,7 +763,8 @@ function getPage() {
         var page;
         if (this.status === 200) {
             page = this.responseText;
-            if (authenticated(page)) {
+            authenticate(page);
+            if (allowed) {
                 getRaw(page);
             } else {
                 /* inform user to login */
