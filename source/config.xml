@@ -1,10 +1,10 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='utf-8'?>
 <widget 
 	xmlns="http://www.w3.org/ns/widgets" 
 	id="https://addons.opera.com/extensions/details/google-adsense-monitor/" 
 	defaultlocale="en" 
 	viewmodes="minimized" 
-	version="12.11">
+	version="12.12">
 	
 	<name short="AdsenseMonitor">Google Adsense Monitor</name>
 	<author email="thewebdev@yandex.com">M Shabeer Ali</author>
