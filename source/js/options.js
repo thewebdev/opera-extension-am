@@ -1,4 +1,4 @@
-﻿/*  This file is part of Google Adsense Monitor. Google Adsense Monitor
+/*  This file is part of Google Adsense Monitor. Google Adsense Monitor
 	is an Opera extension that lets you view updates to your latest 
 	adsense earnings in an Opera Speed Dial.
 	
@@ -22,6 +22,11 @@
 	Email: thewebdev@yandex.com 
 */
 
+/*jslint plusplus: true, continue: true */
+/*global document: false, clearInterval: false, clearTimeout: false, setInterval: false, setTimeout: false, XMLHttpRequest: false, localStorage: false, window: false, chrome: false, opera: false, widget: false, ErrorEvent: false */
+
+"use strict";
+
 var update = 0;
 
 function $(v) {
@@ -36,7 +41,7 @@ function hide(id) {
 
 function show(id) {
 	$(id).style.display = 'block';
-}	
+}
 
 function status(msg) {
 	/* Used to display messages
@@ -51,15 +56,15 @@ function status(msg) {
 	clearTimeout(hangTimer);
 	hangTimer = setTimeout(function () {
 		hide("msg");
-	}, 7000);	
+	}, 7000);
 }
 
 function apply() {
 	/* Saves the changes permanently */
 	
-	var checketo, checkemo, checketu, checkass;
-	var i, d;
-	var save = false;
+	var checketo, checkemo, checketu, checkass, checkalc, i, d, save, arc, luc;
+	
+    save = false;
 
 	checketo = document.input.eto.checked;
 	checketo = checketo ? 1 : 0;
@@ -79,15 +84,15 @@ function apply() {
 	/* Validate - Atleast one item 
 	   needs to be displayed. */
 	
-	if ((checketo == 0) && (checkemo == 0) && (checketu == 0)) {
+	if ((checketo === 0) && (checkemo === 0) && (checketu === 0)) {
 		status("Error: Atleast ONE type of earnings should be selected.");
 		return;
 	}
 	
 	i = document.input.interval.value;
-	i = parseInt(i, 10);		
+	i = parseInt(i, 10);
 
-	if (!i) { 
+	if (!i) {
 		/* Validation - interval should be a number */
 		status("Error: Update interval should be a number");
 		return;
@@ -98,13 +103,13 @@ function apply() {
 	if (i < 15) {
 		/* Validation - interval cannot be less than 15 */
 		status("Error: Update interval should be more than 15 minutes.");
-		return;			
+		return;
 	}
 
 	d = document.input.delay.value;
 	d = parseInt(d, 10);
 	
-	if ((!d) && (d != 0)) { 
+	if ((!d) && (d !== 0)) {
 		/* Validation - delay should be a number */
 		status("Error: Display delay should be a number");
 		return;
@@ -115,8 +120,8 @@ function apply() {
 	if (d <= 0) {
 		/* Validation - delay cannot be less than 1 */
 		status("Error: Display delay can't be less than 1 second.");
-		return;			
-	}	
+		return;
+	}
 	
 	/* save changes */
 	widget.preferences.edaily = checketo;
@@ -132,14 +137,14 @@ function apply() {
 	
 	if (checkalc) {
 	
-		var arc = document.input.first.value;
-		var luc = document.input.second.value;
+		arc = document.input.first.value;
+		luc = document.input.second.value;
 		
 		// Adsense Report Currency
 		widget.preferences.arc = arc;
 		
 		//Local User Currency
-		widget.preferences.luc = luc ;
+		widget.preferences.luc = luc;
 		
 		opera.extension.bgProcess.scrape();
 	}
@@ -154,56 +159,6 @@ function apply() {
 	return;
 }
 
-function load() {
-	/* Loads the saved values and displays 
-	   it to the user for making changes. */ 
-	
-	var edaily = parseInt(widget.preferences.edaily, 10);
-	var emonthly = parseInt(widget.preferences.emonthly, 10);
-	var etotal = parseInt(widget.preferences.etotal, 10);
-	
-	var slideshow = parseInt(widget.preferences.slideshow, 10);
-	var interval = widget.preferences.interval;
-	var showfor = widget.preferences.showfor;
-	
-	var convert = parseInt(widget.preferences.convert, 10);
-	
-	
-	if (edaily) { document.input.eto.checked = true; } 
-	if (emonthly) { document.input.emo.checked = true; } 
-	if (etotal) {document.input.etu.checked = true;	}
-	if (slideshow) {document.input.ass.checked = true; }	
-	
-	if (convert) {
-		update = 1;
-		document.input.alc.checked = true; 
-	}
-	
-	document.input.interval.value = interval;
-	document.input.delay.value = showfor;
-
-	$('first').value = widget.preferences.arc;
-	$('second').value = widget.preferences.luc;
-	
-	disable();
-	nocurrency();
-}
-
-function nocurrency() {
-	var check;
-	
-	check = document.input.alc.checked;
-	check = check ? 1 : 0;
-	
-	if (check) {
-		document.input.first.disabled = false;
-		document.input.second.disabled = false;	
-	} else {
-		document.input.first.disabled = true;
-		document.input.second.disabled = true;
-	}
-}
-
 function disable() {
 	var check;
 	
@@ -215,6 +170,60 @@ function disable() {
 	} else {
 		document.input.delay.disabled = false;
 	}
+}
+
+function nocurrency() {
+	var check;
+	
+	check = document.input.alc.checked;
+	check = check ? 1 : 0;
+	
+	if (check) {
+		document.input.first.disabled = false;
+		document.input.second.disabled = false;
+        show("currency");
+	} else {
+		document.input.first.disabled = true;
+		document.input.second.disabled = true;
+        hide("currency");
+	}
+}
+
+function load() {
+	/* Loads the saved values and displays 
+	   it to the user for making changes. */
+    
+    var edaily, emonthly, etotal, slideshow, interval, showfor, convert;
+	
+	edaily = parseInt(widget.preferences.edaily, 10);
+	emonthly = parseInt(widget.preferences.emonthly, 10);
+	etotal = parseInt(widget.preferences.etotal, 10);
+	
+	slideshow = parseInt(widget.preferences.slideshow, 10);
+	interval = widget.preferences.interval;
+	showfor = widget.preferences.showfor;
+	
+    convert = parseInt(widget.preferences.convert, 10);
+	
+	
+	if (edaily) { document.input.eto.checked = true; }
+	if (emonthly) { document.input.emo.checked = true; }
+	if (etotal) {document.input.etu.checked = true;	}
+	if (slideshow) {document.input.ass.checked = true; }
+	
+	if (convert) {
+		update = 1;
+		document.input.alc.checked = true;
+	}
+	
+	document.input.interval.value = interval;
+	document.input.delay.value = showfor;
+
+	$('first').value = widget.preferences.arc;
+	$('second').value = widget.preferences.luc;
+	
+	disable();
+	nocurrency();
 }
 
 function init() {
