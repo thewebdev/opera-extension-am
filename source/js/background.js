@@ -68,6 +68,17 @@ function trueRound(value) {
     return (Math.round((value * Math.pow(10, digits)).toFixed(digits - 1)) / Math.pow(10, digits)).toFixed(digits);
 }
 
+function scrape() {
+	/* get the data */
+	
+	var convert = parseInt(widget.preferences.convert, 10);
+	if (convert) {
+		getRates();
+	}
+	
+	getPage();
+}
+
 function createDl(kids) {
 /*  Creates the definition list used to
 	display the data in the speed dial.
@@ -244,6 +255,11 @@ function startSlide(count) {
 	tempDd = null;
 }
 
+function setRefreshTimer() {
+	clearInterval(timeIt);
+	timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
+}
+
 function refDial(cmd, out) {
 	/* Used to show the output
 	   in the speed dial. */
@@ -295,6 +311,13 @@ function refDial(cmd, out) {
 		
 		/*  start displaying the data */
 		startSlide(out.length);
+        
+        /*  reset timer if we are
+            recovering from login or
+            network error */
+        
+        setRefreshTimer();
+        
 		return;
 	}
 	
@@ -347,13 +370,20 @@ function refDial(cmd, out) {
 		hide("wait");
 		show("data");
 
+        /*  reset timer if we are
+            recovering from login or
+            network error */
+        
+        setRefreshTimer();
+        
 		return;
 	}
 
 	if (cmd === "login") {
 		/* tell the user to login */
-
-		$("msg").firstChild.nodeValue = "please login";
+        
+        $("indicator").setAttribute("src", "../pix/wait.gif");
+		$("msg").innerHTML = "Please login" + "<br \\>" + "(and wait 2 minutes).";
 
 		clearInterval(slider);
 		hide("data");
@@ -365,7 +395,8 @@ function refDial(cmd, out) {
 	if (cmd === "wait") {
 		/* used to indicate that an
 		   update of data is underway */
-
+        
+        $("indicator").setAttribute("src", "../pix/loading.gif");
 		$("msg").firstChild.nodeValue = "updating";
 
 		clearInterval(slider);
@@ -379,7 +410,8 @@ function refDial(cmd, out) {
 		/* indicate some error
 		   has occured */
 
-		$("msg").firstChild.nodeValue = "Possible network error. Will retry again later.";
+        $("indicator").setAttribute("src", "../pix/wait.gif");
+		$("msg").innerHTML = "Possible network error" + "<br \\>" + "(will retry again later).";
 		
 		clearInterval(slider);
 		hide("data");
@@ -408,10 +440,6 @@ function extract() {
 	
 	if (earnings) {
 		refDial('wait');
-			
-		/* reset refresh timer to default setting */
-		clearInterval(timeIt);
-		timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
 			
 		if (edaily) {
             /* Daily earnings data */
@@ -682,12 +710,31 @@ function getTotal() {
         } else {
             /* possible network error -
                tell the user. */
+            
             refDial("hang");
+            
+            /* reset refresh timer to check every  
+               30 seconds if network is up */
+            clearInterval(timeIt);
+            timeIt = setInterval(scrape, 30000);
         }
 	};
     
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	xhr.send(p);
+    
+    try {
+        xhr.send(p);
+    } catch (e) {
+        /*  possible network error -
+            tell the user. */
+        
+        refDial("hang");
+        
+        /* reset refresh timer to check every  
+           30 seconds if network is up */
+        clearInterval(timeIt);
+        timeIt = setInterval(scrape, 30000);
+    }
 }
  
 function getRaw(input) {
@@ -726,7 +773,13 @@ function getRaw(input) {
         } else {
             /* possible network error -
                tell the user. */
+                        
             refDial("hang");
+            
+            /* reset refresh timer to check every  
+               30 seconds if network is up */
+            clearInterval(timeIt);
+            timeIt = setInterval(scrape, 30000);
         }
     };
     
@@ -735,7 +788,6 @@ function getRaw(input) {
     
     xhr.open('POST', url, true);
     xhr.onload = onLoad;
-    xhr.timeout = 10000;
     xhr.withCredentials = true;
     
     xhr.setRequestHeader("Referer", "https://www.google.com/adsense/m/");
@@ -744,7 +796,19 @@ function getRaw(input) {
     xhr.setRequestHeader("Client-Version", lfedata[1]);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
     
-    xhr.send(c);
+    try {
+        xhr.send(c);
+    } catch (e) {
+        /*  possible network error -
+            tell the user. */
+        
+        refDial("hang");
+        
+        /* reset refresh timer to check every  
+           30 seconds if network is up */
+        clearInterval(timeIt);
+        timeIt = setInterval(scrape, 30000);
+    }
 }
 
 function getPage() {
@@ -759,46 +823,51 @@ function getPage() {
     ext = new XMLHttpRequest();
 	ext.open('GET', url, true);
     
-	ext.onload = function (event) {
+	ext.onreadystatechange = function (event) {
         var page;
-        if (this.status === 200) {
-            page = this.responseText;
-            authenticate(page);
-            if (allowed) {
-                getRaw(page);
+        if (this.readyState === 4) {
+            if (this.status === 200 && this.responseText) {
+                page = this.responseText;
+                authenticate(page);
+                if (allowed) {
+                    getRaw(page);
+                } else {
+                    /* inform user to login */
+                    refDial('login');
+                    
+                    /* reset refresh timer to check every  
+                       2 minute if user has logged in */
+                    clearInterval(timeIt);
+                    timeIt = setInterval(scrape, 120000);
+                }
             } else {
-                /* inform user to login */
-                refDial('login');
+                /*  possible network error -
+                    tell the user. */
+                
+                refDial("hang");
                 
                 /* reset refresh timer to check every  
-                   minute if user has logged in */
+                   30 seconds if network is up */
                 clearInterval(timeIt);
-                timeIt = setInterval(scrape, 60000);
+                timeIt = setInterval(scrape, 30000);
             }
-        } else {
-            /* possible network error -
-				tell the user. */
-            refDial("hang");
         }
 	};
-
-	ext.send();
-}
-
-function scrape() {
-	/* get the data */
-	
-	var convert = parseInt(widget.preferences.convert, 10);
-	if (convert) {
-		getRates();
-	}
-	
-	getPage();
-}
-
-function setRefreshTimer() {
-	clearInterval(timeIt);
-	timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
+    
+    try {
+        ext.send();
+    } catch (e) {
+        /*  possible network error -
+            tell the user. */
+        
+        opera.postError("Caught it");
+        refDial("hang");
+        
+        /* reset refresh timer to check every  
+           30 seconds if network is up */
+        clearInterval(timeIt);
+        timeIt = setInterval(scrape, 30000);
+    }
 }
 
 function setDisplayTimer() {
