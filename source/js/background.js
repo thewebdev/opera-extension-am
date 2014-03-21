@@ -397,7 +397,7 @@ function refDial(cmd, out) {
 		   update of data is underway */
         
         $("indicator").setAttribute("src", "../pix/loading.gif");
-		$("msg").firstChild.nodeValue = "updating";
+		$("msg").innerHTML = "updating";
 
 		clearInterval(slider);
 		hide("data");
