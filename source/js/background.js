@@ -443,18 +443,9 @@ function extract() {
 			
 		if (edaily) {
             /* Daily earnings data */
-            
-            temp = earnings.filter(function (item) {
-                if (item.indexOf("Today so far") !== -1) { return true; }
-            });
-            
-            now = temp[0][2];
-            
-            temp = earnings.filter(function (item) {
-                if (item.indexOf("Yesterday") !== -1) { return true; }
-            });
-            
-			y = temp[0][2];
+                
+            now = earnings[0][2];
+			y = earnings[1][2];
 
 			/* check if earning data is more or
 			   less than previous day's earning */
@@ -490,18 +481,9 @@ function extract() {
 			
 		if (emonthly) {
             /* Monthly earnings data */
-            
-            temp = earnings.filter(function (item) {
-                if (item.indexOf("This month so far") !== -1) { return true; }
-            });
-            
-			tm = temp[0][2];
-        
-            temp = earnings.filter(function (item) {
-                if (item.indexOf("Last month") !== -1) { return true; }
-            });
-            
-			lm = temp[0][2];
+
+			tm = earnings[2][2];
+			lm = earnings[3][2];
 		  
             /* check if earning data is more or
 			   less than previous month's earning */
@@ -685,10 +667,16 @@ function getTotal() {
 
     var url, xhr, p;
     
-    /*  Total unpaid earnings is updated
+    /*  Be nice to Google.
+        Total unpaid earnings is updated
         only monthly. So once we get it, 
         no need to constantly check 
-        again for updates. */
+        again for updates. 
+        
+        TODO: Do month check so that
+        total is correct when user 
+        is up past midnight at the end
+        of a month. */
     
     if (totality) {
         extract();
