@@ -740,7 +740,7 @@ function getRaw(input) {
    an invalid JSON that has the daily
    and monthly earnings data we seek. */
     
-    var lfedata, url, xhr, a, b, c, onLoad;
+    var lfedata, url, xhr, onLoad;
     
     lfedata = input.substring(input.indexOf("ads.adsense.lightfe.main.init") + 31, input.indexOf("ads.adsense.lightfe.home.loadData"));
         
@@ -780,9 +780,6 @@ function getRaw(input) {
         }
     };
     
-    a = '';
-    c = a + "=" + b;
-    
     xhr.open('POST', url, true);
     xhr.onload = onLoad;
     xhr.withCredentials = true;
@@ -794,7 +791,7 @@ function getRaw(input) {
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
     
     try {
-        xhr.send(c);
+        xhr.send();
     } catch (e) {
         /*  possible network error -
             tell the user. */
