@@ -255,9 +255,9 @@ function startSlide(count) {
 	tempDd = null;
 }
 
-function setRefreshTimer() {
+function setRefreshTimer(time) {
 	clearInterval(timeIt);
-	timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
+	timeIt = setInterval(scrape, time * 60 * 1000);
 }
 
 function refDial(cmd, out) {
@@ -316,7 +316,7 @@ function refDial(cmd, out) {
             recovering from login or
             network error */
         
-        setRefreshTimer();
+        setRefreshTimer(parseInt((widget.preferences.interval), 10));
         
 		return;
 	}
@@ -374,7 +374,7 @@ function refDial(cmd, out) {
             recovering from login or
             network error */
         
-        setRefreshTimer();
+        setRefreshTimer(parseInt((widget.preferences.interval), 10));
         
 		return;
 	}
@@ -715,8 +715,7 @@ function getTotal() {
             
             /* reset refresh timer to check every  
                30 seconds if network is up */
-            clearInterval(timeIt);
-            timeIt = setInterval(scrape, 30000);
+            setRefreshTimer(0.5);
         }
 	};
     
@@ -732,8 +731,7 @@ function getTotal() {
         
         /* reset refresh timer to check every  
            30 seconds if network is up */
-        clearInterval(timeIt);
-        timeIt = setInterval(scrape, 30000);
+        setRefreshTimer(0.5);
     }
 }
  
@@ -778,8 +776,7 @@ function getRaw(input) {
             
             /* reset refresh timer to check every  
                30 seconds if network is up */
-            clearInterval(timeIt);
-            timeIt = setInterval(scrape, 30000);
+            setRefreshTimer(0.5);
         }
     };
     
@@ -806,8 +803,7 @@ function getRaw(input) {
         
         /* reset refresh timer to check every  
            30 seconds if network is up */
-        clearInterval(timeIt);
-        timeIt = setInterval(scrape, 30000);
+        setRefreshTimer(0.5);
     }
 }
 
@@ -837,8 +833,7 @@ function getPage() {
                     
                     /* reset refresh timer to check every  
                        2 minute if user has logged in */
-                    clearInterval(timeIt);
-                    timeIt = setInterval(scrape, 120000);
+                    setRefreshTimer(2);
                 }
             } else {
                 /*  possible network error -
@@ -848,8 +843,7 @@ function getPage() {
                 
                 /* reset refresh timer to check every  
                    30 seconds if network is up */
-                clearInterval(timeIt);
-                timeIt = setInterval(scrape, 30000);
+                setRefreshTimer(0.5);
             }
         }
 	};
@@ -865,8 +859,7 @@ function getPage() {
         
         /* reset refresh timer to check every  
            30 seconds if network is up */
-        clearInterval(timeIt);
-        timeIt = setInterval(scrape, 30000);
+        setRefreshTimer(0.5);
     }
 }
 
@@ -882,7 +875,7 @@ function reconfigure(e) {
 	if (e.storageArea !== widget.preferences) { return; }
 	switch (e.key) {
     case 'interval':
-        setRefreshTimer();
+        setRefreshTimer(parseInt((widget.preferences.interval), 10));
         break;
     case 'showfor':
         setDisplayTimer();
