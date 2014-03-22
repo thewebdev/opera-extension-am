@@ -64,14 +64,18 @@ function trueRound(value) {
 /*  Original code from stackoverflow.com 
 	Rounds a float to specified number of decimal places */
 
-	var digits = 2;
+	var digits;
+    
+    digits = 2;
     return (Math.round((value * Math.pow(10, digits)).toFixed(digits - 1)) / Math.pow(10, digits)).toFixed(digits);
 }
 
 function scrape() {
 	/* get the data */
 	
-	var convert = parseInt(widget.preferences.convert, 10);
+	var convert;
+    
+    convert = parseInt(widget.preferences.convert, 10);
 	if (convert) {
 		getRates();
 	}
@@ -91,7 +95,18 @@ function createDl(kids) {
 	as it is faster to create the elements
 	separately and then add to the page. */
 	
-	var dl, dt, dd, tx, temp, temp1, inHtml, list, z, a, x, i;
+	var dl,
+        dt,
+        dd,
+        tx,
+        temp,
+        temp1,
+        inHtml,
+        list,
+        z,
+        a,
+        x,
+        i;
 	
     inHtml = document.createDocumentFragment();
 	list = $("rateSlides");
@@ -177,7 +192,16 @@ function startSlide(count) {
 	   are displayed, while others stay
 	   hidden, using css. */
 	
-	var cls, dt, dd, done, tempDt, tempDd, e, i, s, t;
+	var cls,
+        dt,
+        dd,
+        done,
+        tempDt,
+        tempDd,
+        e,
+        i,
+        s,
+        t;
 	
 	done = false;
 	tempDt = [];
@@ -264,7 +288,10 @@ function refDial(cmd, out) {
 	/* Used to show the output
 	   in the speed dial. */
 	
-    var dt, dd, temp, o;
+    var dt,
+        dd,
+        temp,
+        o;
     
 	if (cmd === "slides") {
 		/* Displays each data individually 
@@ -425,7 +452,25 @@ function extract() {
 /*  Extract and format the raw 
     data for our use. */
 	   
-	var earnings, now, y, tm, lm, dComp, mComp, tue, te, eto, emo, etu, edaily, emonthly, etotal, slideshow, convert, temp, div;
+	var earnings,
+        now,
+        y,
+        tm,
+        lm,
+        dComp,
+        mComp,
+        tue,
+        te,
+        eto,
+        emo,
+        etu,
+        edaily,
+        emonthly,
+        etotal,
+        slideshow,
+        convert,
+        temp,
+        div;
 	
     out = [];
 	
@@ -559,7 +604,9 @@ function extract() {
 function converter(file, arc, luc) {
 	/* Currency conversion */
 	
-    var csv, rates;
+    var csv,
+        rates;
+    
 	csv = file.split(/\r?\n/);
 	
 	if (arc === 'USD') {
@@ -580,7 +627,10 @@ function authenticate(input) {
 /*  checks if user is logged in
     and returns True or False */
     
-    var stat, gcode, div, login;
+    var stat,
+        gcode,
+        div,
+        login;
     
     stat = false;
     
@@ -620,7 +670,12 @@ function authenticate(input) {
 function getRates() {
 	/* Get currency rate from Yahoo! */
 	
-	var csvfile, query, url, arc, luc, ext;
+	var csvfile,
+        query,
+        url,
+        arc,
+        luc,
+        ext;
 	
     url = 'http://download.finance.yahoo.com/d/quotes.csv?f=sl1&e=.cs&s=';
 	
@@ -665,7 +720,9 @@ function getTotal() {
 /* To get total unpaid
     finalised earnings. */
 
-    var url, xhr, p;
+    var url,
+        xhr,
+        p;
     
     /*  Be nice to Google.
         Total unpaid earnings is updated
@@ -728,7 +785,10 @@ function getRaw(input) {
    an invalid JSON that has the daily
    and monthly earnings data we seek. */
     
-    var lfedata, url, xhr, onLoad;
+    var lfedata,
+        url,
+        xhr,
+        onLoad;
     
     lfedata = input.substring(input.indexOf("ads.adsense.lightfe.main.init") + 31, input.indexOf("ads.adsense.lightfe.home.loadData"));
         
@@ -796,7 +856,9 @@ function getPage() {
 /* Scrape the mobile version of 
     Google Adsense Control Panel. */
 
-    var url, ext;
+    var url,
+        ext;
+    
 	url = "https://www.google.com/adsense/m/";
 	
 	refDial('wait');
