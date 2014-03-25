@@ -72,14 +72,7 @@ function trueRound(value) {
 
 function scrape() {
 	/* get the data */
-	
-	var convert;
     
-    convert = parseInt(widget.preferences.convert, 10);
-	if (convert) {
-		getRates();
-	}
-	
 	getPage();
 }
 
@@ -410,7 +403,7 @@ function refDial(cmd, out) {
 		/* tell the user to login */
         
         $("indicator").setAttribute("src", "../pix/wait.gif");
-		$("msg").innerHTML = "Please login" + "<br \\>" + "(and wait 2 minutes).";
+		$("msg").innerHTML = "Please login" + "<br \\>" + "(and wait 2 minutes)";
 
 		clearInterval(slider);
 		hide("data");
@@ -438,7 +431,7 @@ function refDial(cmd, out) {
 		   has occured */
 
         $("indicator").setAttribute("src", "../pix/wait.gif");
-		$("msg").innerHTML = "Possible network error" + "<br \\>" + "(will retry again later).";
+		$("msg").innerHTML = "Possible network error" + "<br \\>" + "(will retry again later)";
 		
 		clearInterval(slider);
 		hide("data");
@@ -632,7 +625,7 @@ function authenticate(input) {
         div,
         login;
     
-    stat = false;
+    allowed = false;
     
 	if (input) {
 	/*  parse the scraped page we got from Google */
@@ -664,7 +657,7 @@ function authenticate(input) {
             allowed = true;
         }
     }
-    return stat;
+    return;
 }
 
 function getRates() {
@@ -703,16 +696,33 @@ function getRates() {
 			if (this.status === 200 && this.responseText) {
 				csvfile = this.responseText;
 				converter(csvfile, arc, luc);
+                extract();
 			} else {
 				/* possible network error -
 				   tell the user. */
 				
 				refDial('hang');
+                
+                /* reset refresh timer to check every  
+                   30 seconds if network is up */
+                setRefreshTimer(0.5);
 			}
 		}
 	};
 
-	ext.send();
+    try {
+        ext.send();
+    } catch (e) {
+        /*  possible network error -
+            tell the user. */
+        
+        refDial("hang");
+        
+        /* reset refresh timer to check every  
+           30 seconds if network is up */
+        setRefreshTimer(0.5);
+    }
+    
 	return;
 }
 
@@ -720,23 +730,25 @@ function getTotal() {
 /* To get total unpaid
     finalised earnings. */
 
-    var url,
+    var convert,
+        url,
         xhr,
         p;
+    
+    convert = parseInt(widget.preferences.convert, 10);
     
     /*  Be nice to Google.
         Total unpaid earnings is updated
         only monthly. So once we get it, 
         no need to constantly check 
-        again for updates. 
-        
-        TODO: Do month check so that
-        total is correct when user 
-        is up past midnight at the end
-        of a month. */
+        again for updates. */
     
     if (totality) {
-        extract();
+        if (convert) {
+            getRates();
+        } else {
+            extract();
+        }
         return;
     }
     
@@ -750,16 +762,34 @@ function getTotal() {
 	xhr.onload = function (event) {
         if (this.status === 200) {
             etable = this.responseText;
-            totality = true;
-            extract();
+            authenticate(etable);
+            if (allowed) {
+                totality = true;
+
+                convert = parseInt(widget.preferences.convert, 10);
+                if (convert) {
+                    getRates();
+                } else {
+                    extract();
+                }
+            } else {
+                totality = false;
+                
+                /* inform user to login */
+                refDial('login');
+                
+                /*  reset refresh timer to check every 
+                    2 minute if user has logged in. */
+                setRefreshTimer(2);
+            }
         } else {
-            /* possible network error -
-               tell the user. */
-            
+            /*  possible network error -
+                tell the user. */
+        
             refDial("hang");
-            
-            /* reset refresh timer to check every  
-               30 seconds if network is up */
+        
+            /*  reset refresh timer to check every  
+                30 seconds if network is up */
             setRefreshTimer(0.5);
         }
 	};
@@ -778,6 +808,11 @@ function getTotal() {
            30 seconds if network is up */
         setRefreshTimer(0.5);
     }
+
+    /* TODO: Add month check so that
+    total is correct when user 
+    is up past midnight at the end
+    of a month. */
 }
  
 function getRaw(input) {
@@ -833,7 +868,6 @@ function getRaw(input) {
     xhr.withCredentials = true;
     
     xhr.setRequestHeader("Referer", "https://www.google.com/adsense/m/");
-    xhr.setRequestHeader("Content-Length", "0");
     xhr.setRequestHeader("X-Lightfe-Auth", "1");
     xhr.setRequestHeader("Client-Version", lfedata[1]);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -900,8 +934,7 @@ function getPage() {
     } catch (e) {
         /*  possible network error -
             tell the user. */
-        
-        opera.postError("Caught it");
+
         refDial("hang");
         
         /* reset refresh timer to check every  
