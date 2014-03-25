@@ -64,18 +64,15 @@ function trueRound(value) {
 /*  Original code from stackoverflow.com 
 	Rounds a float to specified number of decimal places */
 
-	var digits = 2;
+	var digits;
+    
+    digits = 2;
     return (Math.round((value * Math.pow(10, digits)).toFixed(digits - 1)) / Math.pow(10, digits)).toFixed(digits);
 }
 
 function scrape() {
 	/* get the data */
-	
-	var convert = parseInt(widget.preferences.convert, 10);
-	if (convert) {
-		getRates();
-	}
-	
+    
 	getPage();
 }
 
@@ -91,7 +88,18 @@ function createDl(kids) {
 	as it is faster to create the elements
 	separately and then add to the page. */
 	
-	var dl, dt, dd, tx, temp, temp1, inHtml, list, z, a, x, i;
+	var dl,
+        dt,
+        dd,
+        tx,
+        temp,
+        temp1,
+        inHtml,
+        list,
+        z,
+        a,
+        x,
+        i;
 	
     inHtml = document.createDocumentFragment();
 	list = $("rateSlides");
@@ -177,7 +185,16 @@ function startSlide(count) {
 	   are displayed, while others stay
 	   hidden, using css. */
 	
-	var cls, dt, dd, done, tempDt, tempDd, e, i, s, t;
+	var cls,
+        dt,
+        dd,
+        done,
+        tempDt,
+        tempDd,
+        e,
+        i,
+        s,
+        t;
 	
 	done = false;
 	tempDt = [];
@@ -255,16 +272,19 @@ function startSlide(count) {
 	tempDd = null;
 }
 
-function setRefreshTimer() {
+function setRefreshTimer(time) {
 	clearInterval(timeIt);
-	timeIt = setInterval(scrape, parseInt((widget.preferences.interval), 10) * 60 * 1000);
+	timeIt = setInterval(scrape, time * 60 * 1000);
 }
 
 function refDial(cmd, out) {
 	/* Used to show the output
 	   in the speed dial. */
 	
-    var dt, dd, temp, o;
+    var dt,
+        dd,
+        temp,
+        o;
     
 	if (cmd === "slides") {
 		/* Displays each data individually 
@@ -316,7 +336,7 @@ function refDial(cmd, out) {
             recovering from login or
             network error */
         
-        setRefreshTimer();
+        setRefreshTimer(parseInt((widget.preferences.interval), 10));
         
 		return;
 	}
@@ -374,7 +394,7 @@ function refDial(cmd, out) {
             recovering from login or
             network error */
         
-        setRefreshTimer();
+        setRefreshTimer(parseInt((widget.preferences.interval), 10));
         
 		return;
 	}
@@ -383,7 +403,7 @@ function refDial(cmd, out) {
 		/* tell the user to login */
         
         $("indicator").setAttribute("src", "../pix/wait.gif");
-		$("msg").innerHTML = "Please login" + "<br \\>" + "(and wait 2 minutes).";
+		$("msg").innerHTML = "Please login" + "<br \\>" + "(and wait 2 minutes)";
 
 		clearInterval(slider);
 		hide("data");
@@ -411,7 +431,7 @@ function refDial(cmd, out) {
 		   has occured */
 
         $("indicator").setAttribute("src", "../pix/wait.gif");
-		$("msg").innerHTML = "Possible network error" + "<br \\>" + "(will retry again later).";
+		$("msg").innerHTML = "Possible network error" + "<br \\>" + "(will retry again later)";
 		
 		clearInterval(slider);
 		hide("data");
@@ -425,7 +445,25 @@ function extract() {
 /*  Extract and format the raw 
     data for our use. */
 	   
-	var earnings, now, y, tm, lm, dComp, mComp, tue, te, eto, emo, etu, edaily, emonthly, etotal, slideshow, convert, temp, div;
+	var earnings,
+        now,
+        y,
+        tm,
+        lm,
+        dComp,
+        mComp,
+        tue,
+        te,
+        eto,
+        emo,
+        etu,
+        edaily,
+        emonthly,
+        etotal,
+        slideshow,
+        convert,
+        temp,
+        div;
 	
     out = [];
 	
@@ -443,18 +481,9 @@ function extract() {
 			
 		if (edaily) {
             /* Daily earnings data */
-            
-            temp = earnings.filter(function (item) {
-                if (item.indexOf("Today so far") !== -1) { return true; }
-            });
-            
-            now = temp[0][2];
-            
-            temp = earnings.filter(function (item) {
-                if (item.indexOf("Yesterday") !== -1) { return true; }
-            });
-            
-			y = temp[0][2];
+                
+            now = earnings[0][2];
+			y = earnings[1][2];
 
 			/* check if earning data is more or
 			   less than previous day's earning */
@@ -490,18 +519,9 @@ function extract() {
 			
 		if (emonthly) {
             /* Monthly earnings data */
-            
-            temp = earnings.filter(function (item) {
-                if (item.indexOf("This month so far") !== -1) { return true; }
-            });
-            
-			tm = temp[0][2];
-        
-            temp = earnings.filter(function (item) {
-                if (item.indexOf("Last month") !== -1) { return true; }
-            });
-            
-			lm = temp[0][2];
+
+			tm = earnings[2][2];
+			lm = earnings[3][2];
 		  
             /* check if earning data is more or
 			   less than previous month's earning */
@@ -577,7 +597,9 @@ function extract() {
 function converter(file, arc, luc) {
 	/* Currency conversion */
 	
-    var csv, rates;
+    var csv,
+        rates;
+    
 	csv = file.split(/\r?\n/);
 	
 	if (arc === 'USD') {
@@ -598,9 +620,12 @@ function authenticate(input) {
 /*  checks if user is logged in
     and returns True or False */
     
-    var stat, gcode, div, login;
+    var stat,
+        gcode,
+        div,
+        login;
     
-    stat = false;
+    allowed = false;
     
 	if (input) {
 	/*  parse the scraped page we got from Google */
@@ -632,13 +657,18 @@ function authenticate(input) {
             allowed = true;
         }
     }
-    return stat;
+    return;
 }
 
 function getRates() {
 	/* Get currency rate from Yahoo! */
 	
-	var csvfile, query, url, arc, luc, ext;
+	var csvfile,
+        query,
+        url,
+        arc,
+        luc,
+        ext;
 	
     url = 'http://download.finance.yahoo.com/d/quotes.csv?f=sl1&e=.cs&s=';
 	
@@ -666,16 +696,33 @@ function getRates() {
 			if (this.status === 200 && this.responseText) {
 				csvfile = this.responseText;
 				converter(csvfile, arc, luc);
+                extract();
 			} else {
 				/* possible network error -
 				   tell the user. */
 				
 				refDial('hang');
+                
+                /* reset refresh timer to check every  
+                   30 seconds if network is up */
+                setRefreshTimer(0.5);
 			}
 		}
 	};
 
-	ext.send();
+    try {
+        ext.send();
+    } catch (e) {
+        /*  possible network error -
+            tell the user. */
+        
+        refDial("hang");
+        
+        /* reset refresh timer to check every  
+           30 seconds if network is up */
+        setRefreshTimer(0.5);
+    }
+    
 	return;
 }
 
@@ -683,15 +730,25 @@ function getTotal() {
 /* To get total unpaid
     finalised earnings. */
 
-    var url, xhr, p;
+    var convert,
+        url,
+        xhr,
+        p;
     
-    /*  Total unpaid earnings is updated
+    convert = parseInt(widget.preferences.convert, 10);
+    
+    /*  Be nice to Google.
+        Total unpaid earnings is updated
         only monthly. So once we get it, 
         no need to constantly check 
         again for updates. */
     
     if (totality) {
-        extract();
+        if (convert) {
+            getRates();
+        } else {
+            extract();
+        }
         return;
     }
     
@@ -705,18 +762,35 @@ function getTotal() {
 	xhr.onload = function (event) {
         if (this.status === 200) {
             etable = this.responseText;
-            totality = true;
-            extract();
+            authenticate(etable);
+            if (allowed) {
+                totality = true;
+
+                convert = parseInt(widget.preferences.convert, 10);
+                if (convert) {
+                    getRates();
+                } else {
+                    extract();
+                }
+            } else {
+                totality = false;
+                
+                /* inform user to login */
+                refDial('login');
+                
+                /*  reset refresh timer to check every 
+                    2 minute if user has logged in. */
+                setRefreshTimer(2);
+            }
         } else {
-            /* possible network error -
-               tell the user. */
-            
+            /*  possible network error -
+                tell the user. */
+        
             refDial("hang");
-            
-            /* reset refresh timer to check every  
-               30 seconds if network is up */
-            clearInterval(timeIt);
-            timeIt = setInterval(scrape, 30000);
+        
+            /*  reset refresh timer to check every  
+                30 seconds if network is up */
+            setRefreshTimer(0.5);
         }
 	};
     
@@ -732,9 +806,13 @@ function getTotal() {
         
         /* reset refresh timer to check every  
            30 seconds if network is up */
-        clearInterval(timeIt);
-        timeIt = setInterval(scrape, 30000);
+        setRefreshTimer(0.5);
     }
+
+    /* TODO: Add month check so that
+    total is correct when user 
+    is up past midnight at the end
+    of a month. */
 }
  
 function getRaw(input) {
@@ -742,7 +820,10 @@ function getRaw(input) {
    an invalid JSON that has the daily
    and monthly earnings data we seek. */
     
-    var lfedata, url, xhr, a, b, c, onLoad;
+    var lfedata,
+        url,
+        xhr,
+        onLoad;
     
     lfedata = input.substring(input.indexOf("ads.adsense.lightfe.main.init") + 31, input.indexOf("ads.adsense.lightfe.home.loadData"));
         
@@ -778,26 +859,21 @@ function getRaw(input) {
             
             /* reset refresh timer to check every  
                30 seconds if network is up */
-            clearInterval(timeIt);
-            timeIt = setInterval(scrape, 30000);
+            setRefreshTimer(0.5);
         }
     };
-    
-    a = '';
-    c = a + "=" + b;
     
     xhr.open('POST', url, true);
     xhr.onload = onLoad;
     xhr.withCredentials = true;
     
     xhr.setRequestHeader("Referer", "https://www.google.com/adsense/m/");
-    xhr.setRequestHeader("Content-Length", "0");
     xhr.setRequestHeader("X-Lightfe-Auth", "1");
     xhr.setRequestHeader("Client-Version", lfedata[1]);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
     
     try {
-        xhr.send(c);
+        xhr.send();
     } catch (e) {
         /*  possible network error -
             tell the user. */
@@ -806,8 +882,7 @@ function getRaw(input) {
         
         /* reset refresh timer to check every  
            30 seconds if network is up */
-        clearInterval(timeIt);
-        timeIt = setInterval(scrape, 30000);
+        setRefreshTimer(0.5);
     }
 }
 
@@ -815,7 +890,9 @@ function getPage() {
 /* Scrape the mobile version of 
     Google Adsense Control Panel. */
 
-    var url, ext;
+    var url,
+        ext;
+    
 	url = "https://www.google.com/adsense/m/";
 	
 	refDial('wait');
@@ -837,8 +914,7 @@ function getPage() {
                     
                     /* reset refresh timer to check every  
                        2 minute if user has logged in */
-                    clearInterval(timeIt);
-                    timeIt = setInterval(scrape, 120000);
+                    setRefreshTimer(2);
                 }
             } else {
                 /*  possible network error -
@@ -848,8 +924,7 @@ function getPage() {
                 
                 /* reset refresh timer to check every  
                    30 seconds if network is up */
-                clearInterval(timeIt);
-                timeIt = setInterval(scrape, 30000);
+                setRefreshTimer(0.5);
             }
         }
 	};
@@ -859,14 +934,12 @@ function getPage() {
     } catch (e) {
         /*  possible network error -
             tell the user. */
-        
-        opera.postError("Caught it");
+
         refDial("hang");
         
         /* reset refresh timer to check every  
            30 seconds if network is up */
-        clearInterval(timeIt);
-        timeIt = setInterval(scrape, 30000);
+        setRefreshTimer(0.5);
     }
 }
 
@@ -882,7 +955,7 @@ function reconfigure(e) {
 	if (e.storageArea !== widget.preferences) { return; }
 	switch (e.key) {
     case 'interval':
-        setRefreshTimer();
+        setRefreshTimer(parseInt((widget.preferences.interval), 10));
         break;
     case 'showfor':
         setDisplayTimer();

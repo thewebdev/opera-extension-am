@@ -34,6 +34,9 @@ Change display timings, data update intervals, options to view your earnings in 
 
 ## Changelog  
 
+**Version 12.13** -  
+Fixed: Issue #13
+
 **Version 12.12** -  
 Fixed: Partial fix for issue #12.  
 Updated: Options UI - online support highlighted.  
