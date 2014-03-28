@@ -968,7 +968,9 @@ function getRaw(input) {
                 return;
             }
             
-            getTotal();
+            /*  5 seconds delay to make
+                Google happy */
+            setTimeout(getTotal, 5 * 1000);
         } else {
             /*  problem fetching data; retry 
                 after 1 minute */
@@ -1021,7 +1023,10 @@ function getPage() {
             if (this.status === 200 && this.responseText) {
                 page = this.responseText;
                 if (authenticate(page)) {
-                    getRaw(page);
+                    
+                    /*  5 seconds delay to make
+                        Google happy */
+                    setTimeout(getRaw, 5 * 1000, page);
                 } else {
                     /* inform user to login */
                     refDial('login');
