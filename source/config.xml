@@ -4,7 +4,7 @@
 	id="https://addons.opera.com/extensions/details/google-adsense-monitor/" 
 	defaultlocale="en" 
 	viewmodes="minimized" 
-	version="12.14">
+	version="12.15">
 	
 	<name short="AdsenseMonitor">Google Adsense Monitor</name>
 	<author email="thewebdev@yandex.com">M Shabeer Ali</author>
@@ -28,6 +28,8 @@
 	<preference name="convert" value="0"/>
 	<preference name="arc" value="USD"/>
 	<preference name="luc" value="GBP"/>
+    <preference name="month" value="13"/>
+    <preference name="total" value="none"/>
 	<update-description href="https://extension-updates.opera.com/api/w3c-wd1/update/c2885050-a794-4440-b68a-f9b9a019496c/"/>	
 	<license href="http://www.gnu.org/licenses/gpl-3.0.html">Licensed under GPL v3.0</license>
 	<description xml:lang="en">Preview your Adsense earnings in an Opera Speed Dial.</description>

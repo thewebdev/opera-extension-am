@@ -34,6 +34,9 @@ Change display timings, data update intervals, options to view your earnings in 
 
 ## Changelog  
 
+**Version 12.15** -  
+Updated: Get total from TSV file.    
+
 **Version 12.14** -  
 Updated: Better error detection.  
 Updated: Introduced delay between scraping pages.  
