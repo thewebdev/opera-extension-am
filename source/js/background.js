@@ -29,10 +29,9 @@
 var timeIt = null; // data refresh timer
 var slider; // slide time delay
 var data; // raw adsense data
-var tsv; // tsv earnings data
+var total; // total unpaid earning
 var out; // output data
 var rate; // parsed currency rates
-var haveTotal = false; // flag for total earning
 
 function $(v) {
 	/* DOM: identifies element */
@@ -640,11 +639,9 @@ function extract() {
 		}
         
         if (etotal) {
-		/* get total unpaid earnings */
+		/* total unpaid earnings */
             
-            /* lazy parsing */
-            tue = tsv.split("\t");
-            te = tue[tue.length - 1].trim();
+            te = total;
             
             if (convert) {
                 // convert to local currency
@@ -811,25 +808,133 @@ function getRates() {
 }
 
 function getTotal() {
-/* To get total unpaid
+/*  To get total unpaid
     finalised earnings. */
 
-    var convert,
+    var today,
+        month,
+        convert,
         url,
         xhr,
         params,
         id;
     
 	refDial('wait');
+    
+    today = new Date();
+    month = parseInt(widget.preferences.month, 10);
     convert = parseInt(widget.preferences.convert, 10);
     
     /*  Be nice to Google.
         Total unpaid earnings is updated
-        only monthly. So once we get it, 
-        no need to constantly check 
-        again for updates. */
+        only monthly. So once we have it, 
+        do monthly updates only for it. */
     
-    if (haveTotal) {
+    /*  We need to get the total from
+        Adsense, if -
+        (1) 'month' preference is default 
+             value 13 OR
+        (2) we have last month's total. */
+    
+    if ((today.getMonth() > month) || (month === 13)) {
+        
+        /* error detection - check data */
+        try {
+            id = data.accounts[0].id;
+        } catch (f) {
+            /*  problem fetching data; retry 
+                after 1 minute */
+    
+            refDial('nodata');
+            setRefreshTimer(1);
+        }
+        
+        /*  error detection - check id
+            is not undefined */
+        
+        if (id) {
+            params = "csv=true&historical=false&reportRange=ALL_TIME&pid=" + id.trim();
+        } else {
+            /*  problem fetching data; retry 
+                after 1 minute */
+    
+            refDial('nodata');
+            setRefreshTimer(1);
+        }
+        
+        url = "https://www.google.com/adsense/reports-payment?" + params;
+        
+        xhr = new XMLHttpRequest();
+        xhr.open('get', url, true);
+        
+        xhr.onload = function (event) {
+            var tsv,
+                temp,
+                convert;
+            
+            if (this.status === 200) {
+                tsv = this.responseText;
+                if (authenticate(tsv)) {
+                    
+                    /* lazy parsing */
+                    temp = tsv.split("\t");
+                    total = temp[temp.length - 1].trim();
+                    
+                    /*  error detection - total
+                        should be a number */
+                    if (parseFloat(total, 10)) {
+                        
+                        widget.preferences.total = total;
+                        widget.preferences.month = String(today.getMonth());
+                        
+                        convert = parseInt(widget.preferences.convert, 10);
+                    
+                        if (convert) {
+                            getRates();
+                        } else {
+                            extract();
+                        }
+                    } else {
+                        /*  problem fetching data; retry 
+                            after 1 minute */
+            
+                        refDial('nodata');
+                        setRefreshTimer(1);
+                    }
+                } else {
+                    /*  inform user to login - check
+                        again every 2 minutes */
+                    
+                    refDial('login');
+                    setRefreshTimer(2);
+                }
+            } else {
+                /*  problem fetching data; retry 
+                    after 1 minute */
+    
+                refDial('nodata');
+                setRefreshTimer(1);
+            }
+        };
+        
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        
+        try {
+            xhr.send();
+        } catch (e) {
+            /*  possible network error -
+                tell the user. */
+            
+            refDial("hang");
+            
+            /* reset refresh timer to check every  
+               30 seconds if network is up */
+            setRefreshTimer(0.5);
+        }
+    } else {
+        /* reuse saved value */
+        total = widget.preferences.total;
+        
         if (convert) {
             getRates();
         } else {
@@ -837,87 +942,6 @@ function getTotal() {
         }
         return;
     }
-    
-    /* error detection - check data */
-    try {
-        id = data.accounts[0].id;
-    } catch (f) {
-        /*  problem fetching data; retry 
-            after 1 minute */
-
-        refDial('nodata');
-        setRefreshTimer(1);
-    }
-    
-    /*  error detection - check id is
-        not undefined */
-    
-    if (id) {
-        params = "csv=true&historical=false&reportRange=ALL_TIME&pid=" + id.trim();
-    } else {
-        /*  problem fetching data; retry 
-            after 1 minute */
-
-        refDial('nodata');
-        setRefreshTimer(1);
-    }
-    
-    url = "https://www.google.com/adsense/reports-payment?" + params;
-	
-    xhr = new XMLHttpRequest();
-	xhr.open('get', url, true);
-    
-	xhr.onload = function (event) {
-        if (this.status === 200) {
-            tsv = this.responseText;
-            if (authenticate(tsv)) {
-                
-                haveTotal = true;
-                convert = parseInt(widget.preferences.convert, 10);
-                
-                if (convert) {
-                    getRates();
-                } else {
-                    extract();
-                }
-            } else {
-                haveTotal = false;
-                
-                /* inform user to login */
-                refDial('login');
-                
-                /*  reset refresh timer to check every 
-                    2 minute if user has logged in. */
-                setRefreshTimer(2);
-            }
-        } else {
-            /*  problem fetching data; retry 
-                after 1 minute */
-
-            refDial('nodata');
-            setRefreshTimer(1);
-        }
-	};
-    
-    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    
-    try {
-        xhr.send();
-    } catch (e) {
-        /*  possible network error -
-            tell the user. */
-        
-        refDial("hang");
-        
-        /* reset refresh timer to check every  
-           30 seconds if network is up */
-        setRefreshTimer(0.5);
-    }
-
-    /* TODO: Add month check so that
-    total is correct when user 
-    is up past midnight at the end
-    of a month. */
 }
  
 function getRaw(input) {
@@ -974,7 +998,9 @@ function getRaw(input) {
             
             /*  5 seconds delay to make
                 Google happy */
+            
             setTimeout(getTotal, 5 * 1000);
+            
         } else {
             /*  problem fetching data; retry 
                 after 1 minute */
