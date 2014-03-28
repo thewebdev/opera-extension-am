@@ -29,7 +29,7 @@
 var timeIt = null; // data refresh timer
 var slider; // slide time delay
 var data; // raw adsense data
-var etable; // earnings table page
+var tsv; // tsv earnings data
 var out; // output data
 var rate; // parsed currency rates
 var haveTotal = false; // flag for total earning
@@ -642,41 +642,11 @@ function extract() {
         if (etotal) {
 		/* get total unpaid earnings */
             
-            div = e('div');
-            div.innerHTML = etable;
-            
-            /*  if selectors specified are invalid,
-                a syntax error will be thrown. */
-            
-            try {
-                tue = div.querySelector("div#content table.paymentreport tbody tr.columntitle:last-child td:last-child");
-            } catch (f) {
-                /*  Unexpected Error #4 - inform
-                user and retry after 5 minutes */
-                refDial("e104");
-                setRefreshTimer(5);
-                return;
-            }
-            
-            /*  if selectors weren't found
-                tue will be null */
-            
-            if (tue) {
-                te = tue.textContent;
-            } else {
-                /*  Unexpected Error #5 - inform
-                user and retry after 5 minutes */
-                refDial("e105");
-                setRefreshTimer(5);
-                return;
-            }
+            /* lazy parsing */
+            tue = tsv.split("\t");
+            te = tue[tue.length - 1].trim();
             
             if (convert) {
-                te = te.trim();
-                
-                // remove dollar / euro symbol
-                te = te.slice(1);
-                
                 // convert to local currency
                 te = parseFloat(te) * rate;
                 
@@ -753,9 +723,19 @@ function authenticate(input) {
         /* Note: innerHTML doesn't execute any 
            JS code. */
 		div.innerHTML = gcode;
-		
-		/* the login form has an id called 'gaia_loginform' */
-		login = div.querySelector("#gaia_loginform");
+        
+        /*  if selectors specified are invalid,
+            a syntax error will be thrown. */
+            
+        try {
+            /* the login form has an id called 'gaia_loginform' */
+		    login = div.querySelector("#gaia_loginform");
+        } catch (g) {
+            login = null;
+        }
+        
+        /*  if selector isn't found
+            login will be null */
         
         if (login) {
             /* login form found */
@@ -837,8 +817,10 @@ function getTotal() {
     var convert,
         url,
         xhr,
-        p;
+        params,
+        id;
     
+	refDial('wait');
     convert = parseInt(widget.preferences.convert, 10);
     
     /*  Be nice to Google.
@@ -856,17 +838,39 @@ function getTotal() {
         return;
     }
     
-	url = "https://www.google.com/adsense/reports-payment";
-	
-	refDial('wait');
+    /* error detection - check data */
+    try {
+        id = data.accounts[0].id;
+    } catch (f) {
+        /*  problem fetching data; retry 
+            after 1 minute */
+
+        refDial('nodata');
+        setRefreshTimer(1);
+    }
+    
+    /*  error detection - check id is
+        not undefined */
+    
+    if (id) {
+        params = "csv=true&historical=false&reportRange=ALL_TIME&pid=" + id.trim();
+    } else {
+        /*  problem fetching data; retry 
+            after 1 minute */
+
+        refDial('nodata');
+        setRefreshTimer(1);
+    }
+    
+    url = "https://www.google.com/adsense/reports-payment?" + params;
 	
     xhr = new XMLHttpRequest();
-	xhr.open('POST', url, true);
-    p = "reportRange=ALL_TIME";
+	xhr.open('get', url, true);
+    
 	xhr.onload = function (event) {
         if (this.status === 200) {
-            etable = this.responseText;
-            if (authenticate(etable)) {
+            tsv = this.responseText;
+            if (authenticate(tsv)) {
                 
                 haveTotal = true;
                 convert = parseInt(widget.preferences.convert, 10);
@@ -898,7 +902,7 @@ function getTotal() {
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     
     try {
-        xhr.send(p);
+        xhr.send();
     } catch (e) {
         /*  possible network error -
             tell the user. */
