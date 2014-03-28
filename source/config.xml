@@ -24,7 +24,7 @@
 	<preference name="etotal" value="1"/>
 	<preference name="slideshow" value="1"/>
 	<preference name="interval" value="30"/>
-	<preference name="showfor" value="4"/>
+	<preference name="showfor" value="3"/>
 	<preference name="convert" value="0"/>
 	<preference name="arc" value="USD"/>
 	<preference name="luc" value="GBP"/>
