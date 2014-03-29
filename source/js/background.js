@@ -542,6 +542,7 @@ function extract() {
         edaily,
         emonthly,
         etotal,
+        arc,
         slideshow,
         convert,
         temp,
@@ -555,6 +556,7 @@ function extract() {
 	
 	slideshow = parseInt(widget.preferences.slideshow, 10);
 	convert = parseInt(widget.preferences.convert, 10);
+    arc = widget.preferences.arc;
     
     earnings = data.earnings;
 	
@@ -578,10 +580,39 @@ function extract() {
 			if (convert) {
 				now = now.trim();
 				y = y.trim();
-				
-				// remove dollar / euro symbol
-				now = now.slice(1);
-				y = y.slice(1);
+                
+                
+                // remove currency symbol
+                
+                switch (arc) {
+                case "USD":
+                    now = now.substring(now.indexOf('$') + 1);
+                    y = y.substring(y.indexOf('$') + 1);
+                    now = now.trim();
+                    y = y.trim();
+                    break;
+                        
+                case "GBP":
+                    now = now.substring(now.indexOf('£') + 1);
+                    y = y.substring(y.indexOf('£') + 1);
+                    now = now.trim();
+                    y = y.trim();
+                    break;
+                        
+                case "AUD":
+                    now = now.substring(now.indexOf('$') + 1);
+                    y = y.substring(y.indexOf('$') + 1);
+                    now = now.trim();
+                    y = y.trim();
+                    break;
+                        
+                case "EUR":
+                    now = now.substring(now.indexOf('€') + 1);
+                    y = y.substring(y.indexOf('€') + 1);
+                    now = now.trim();
+                    y = y.trim();
+                    break;
+                }
 					
 				// convert to local currency
 				now = parseFloat(now) * rate;
@@ -619,8 +650,36 @@ function extract() {
 				lm = lm.trim();
 				
 				// remove dollar / euro symbol
-				tm = tm.slice(1);
-				lm = lm.slice(1);
+                
+                switch (arc) {
+                case "USD":
+                    tm = tm.substring(tm.indexOf('$') + 1);
+                    lm = lm.substring(lm.indexOf('$') + 1);
+                    tm = tm.trim();
+                    lm = lm.trim();
+                    break;
+                        
+                case "GBP":
+                    tm = tm.substring(tm.indexOf('£') + 1);
+                    lm = lm.substring(lm.indexOf('£') + 1);
+                    tm = tm.trim();
+                    lm = lm.trim();
+                    break;
+                        
+                case "AUD":
+                    tm = tm.substring(tm.indexOf('$') + 1);
+                    lm = lm.substring(lm.indexOf('$') + 1);
+                    tm = tm.trim();
+                    lm = lm.trim();
+                    break;
+                        
+                case "EUR":
+                    tm = tm.substring(tm.indexOf('€') + 1);
+                    lm = lm.substring(lm.indexOf('€') + 1);
+                    tm = tm.trim();
+                    lm = lm.trim();
+                    break;
+                }
 				
 				// convert to local currency
 				tm = parseFloat(tm) * rate;
@@ -760,13 +819,23 @@ function getRates() {
 	
 	arc = widget.preferences.arc;
 	luc = widget.preferences.luc;
-	
-	if (arc === 'USD') {
-		query = arc + luc + '=X';
-	}
-	
-	if (arc === 'EUR') {
+    
+    switch (arc) {
+    case 'USD':
+        query = arc + luc + '=X';
+        break;
+    	
+	case 'EUR':
 		query = 'USDEUR=X&s=USD' + luc + '=X';
+        break;
+	 
+	case 'GBP':
+		query = 'USDGBP=X&s=USD' + luc + '=X';
+        break;
+    
+	case 'AUD':
+		query = 'USDAUD=X&s=USD' + luc + '=X';
+        break;
 	}
 	
 	url = url + query;

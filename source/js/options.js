@@ -205,7 +205,6 @@ function load() {
 	
     convert = parseInt(widget.preferences.convert, 10);
 	
-	
 	if (edaily) { document.input.eto.checked = true; }
 	if (emonthly) { document.input.emo.checked = true; }
 	if (etotal) {document.input.etu.checked = true;	}
